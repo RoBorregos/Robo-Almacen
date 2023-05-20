@@ -9,13 +9,13 @@ const Home: NextPage = () => {
   const { data: Saludo, isLoading } = api.example.hello.useQuery({
     text: "RoBorregos",
   });
-  const { mutate, mutateAsync } = api.example.crear.useMutation();
+  const { mutateAsync } = api.example.crear.useMutation();
   const { data: ejemplos } = api.example.getAll.useQuery();
   const [texto, setTexto] = useState("place holder");
 
   const handleCrear = async () => {
     const asd = await mutateAsync({ name: texto });
-    void utils.example.getAll.invalidate();
+    await utils.example.getAll.invalidate();
   };
 
   return (
@@ -32,14 +32,14 @@ const Home: NextPage = () => {
           <p className="text-center text-2xl text-white">{Saludo?.greeting}</p>
         )}
         <input
-          className="rounded-md bg-white/10 px-4 py-2 text-black"
+          className="rounded-md bg-white/10 px-4 py-2 text-white"
           type="text"
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
         />
         <button
           className="rounded-md bg-blue-500 px-4 py-2 text-white"
-          onClick={void handleCrear()}
+          onClick={() => void handleCrear()}
         >
           crear ejemplo
         </button>
