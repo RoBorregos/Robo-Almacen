@@ -53,7 +53,7 @@ npm run dev
 
 | Name | Github | Email |
 | --- | --- | --- |
-| Iván Romero | [@IvanRomero03](https://github.com/IvanRomero03) | i.wells.ar@gmail |
+| Iván Romero | [@IvanRomero03](https://github.com/IvanRomero03) | i.wells.ar@gmail.com |
 | Oscar Arreola | | |
 | Diego Hernández | | |
 | Alejandra Coeto | | |
