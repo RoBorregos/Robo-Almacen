@@ -17,6 +17,38 @@ Almacén IoT (IoT Wharehouse) is an IoT System for the managment, control and mo
 - [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
 - [Formik](https://formik.org/)
 
+# Installation
+1. Clone the repository
+```bash
+git clone https://github.com/RoBorregos/Robo-Almacen.git
+```
+
+2. Go to the project directory
+```bash
+cd Robo-Almacen
+```
+
+3. Create a `.env` file in the root directory of the project and add the following environment variables
+```bash
+cp .env.example .env
+```
+(Or just make sure that the `.env` file is in the root directory)
+
+1. Install dependencies
+```bash
+npm install
+```
+
+1. Pull the latest changes from the Database
+```bash
+npx prisma db pull
+```
+
+5. Run the development server
+```bash
+npm run dev
+```
+
 # Development Team
 
 | Name | Github | Email |
