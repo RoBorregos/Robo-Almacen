@@ -13,6 +13,11 @@ const Home: NextPage = () => {
   const { data: ejemplos } = api.example.getAll.useQuery();
   const [texto, setTexto] = useState("place holder");
 
+  const handleCrear = async () => {
+    const asd = await mutateAsync({ name: texto });
+    void utils.example.getAll.invalidate();
+  };
+
   return (
     <Layout>
       <div className="flex flex-col items-center justify-center gap-4">
@@ -34,15 +39,14 @@ const Home: NextPage = () => {
         />
         <button
           className="rounded-md bg-blue-500 px-4 py-2 text-white"
-          onClick={async () => {
-            await mutateAsync({ name: texto });
-            utils.example.getAll.invalidate();
-          }}
+          onClick={void handleCrear()}
         >
           crear ejemplo
         </button>
-        {ejemplos?.map((ejemplo) => (
-          <p className="text-center text-2xl text-white">{ejemplo.name}</p>
+        {ejemplos?.map((ejemplo, id) => (
+          <p className="text-center text-2xl text-white" key={id}>
+            {ejemplo.name}
+          </p>
         ))}
         <AuthShowcase />
       </div>
