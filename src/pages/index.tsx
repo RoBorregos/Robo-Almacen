@@ -41,14 +41,13 @@ const Home: NextPage = () => {
           className="rounded-md bg-blue-500 px-4 py-2 text-white"
           onClick={() => void handleCrear()}
         >
-          crear ejemplo
         </button>
         {ejemplos?.map((ejemplo, id) => (
           <p className="text-center text-2xl text-white" key={id}>
             {ejemplo.name}
           </p>
         ))}
-        <AuthShowcase />
+        <AuthShowcase/>
       </div>
     </Layout>
   );
