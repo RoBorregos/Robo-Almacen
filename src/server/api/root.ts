@@ -1,5 +1,6 @@
 import { createTRPCRouter } from "rbgs/server/api/trpc";
 import { exampleRouter } from "rbgs/server/api/routers/example";
+import { celdaRouter } from "rbgs/server/api/routers/celdaApi";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { exampleRouter } from "rbgs/server/api/routers/example";
  */
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
+  celda: celdaRouter,
 });
 
 // export type definition of API
