@@ -15,6 +15,63 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model Item {
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    name        String
+    description String
+    category    String
+    department  String
+
+    CeldaItem CeldaItem[]
+}
+
+model Celda {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String
+
+    CeldaItem CeldaItem[]
+}
+
+model CeldaItem {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    quantity  Int
+    available Int
+    celdaId   String
+    itemId    String
+
+    Prestamo Prestamo[]
+    Celda    Celda      @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+    Item     Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Prestamo {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    initialDate DateTime
+    finalDate   DateTime?
+    quantity    Int
+    celdaItemId String
+    userId      String
+
+    CeldaItem CeldaItem @relation(fields: [celdaItemId], references: [id], onDelete: Cascade)
+    User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Telemetry {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String
+    value     String
+}
+
 model Example {
     id        String   @id @default(cuid())
     name      String
@@ -51,13 +108,14 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String     @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?    @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
+    Prestamo      Prestamo[]
 }
 
 model VerificationToken {
