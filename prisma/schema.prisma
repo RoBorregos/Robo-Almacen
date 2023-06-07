@@ -32,6 +32,8 @@ model Celda {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     name      String
+    row       Int
+    column    Int
 
     CeldaItem CeldaItem[]
 }

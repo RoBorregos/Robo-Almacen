@@ -21,17 +21,34 @@ export const celdaRouter = createTRPCRouter({
     }),
 
   // create: protectedProcedure
-  create: publicProcedure.input(z.string()).mutation(({ input, ctx }) => {
-    return ctx.prisma.celda.create({
-      data: {
-        name: input,
-      },
-    });
-  }),
+  create: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        row: z.number(),
+        column: z.number(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.celda.create({
+        data: {
+          name: input.name,
+          row: input.row,
+          column: input.column,
+        },
+      });
+    }),
 
   // update: protectedProcedure
   update: publicProcedure
-    .input(z.object({ id: z.string(), name: z.string() }))
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        row: z.number(),
+        column: z.number(),
+      })
+    )
     .mutation(({ input, ctx }) => {
       return ctx.prisma.celda.update({
         where: {
@@ -39,6 +56,8 @@ export const celdaRouter = createTRPCRouter({
         },
         data: {
           name: input.name,
+          row: input.row,
+          column: input.column,
         },
       });
     }),
