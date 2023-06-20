@@ -17,6 +17,9 @@ export const celdaRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
+        include: {
+          CeldaItem: true,
+        },
       });
     }),
 
@@ -70,4 +73,63 @@ export const celdaRouter = createTRPCRouter({
       },
     });
   }),
+
+  addItem: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        itemId: z.string(),
+        quantity: z.number(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.celdaItem.create({
+        data: {
+          celdaId: input.id,
+          itemId: input.itemId,
+          quantity: input.quantity,
+          available: input.quantity,
+        },
+      });
+    }),
+
+  removeItem: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        itemId: z.string(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.celdaItem.delete({
+        where: {
+          celdaId_itemId: {
+            celdaId: input.id,
+            itemId: input.itemId,
+          },
+        },
+      });
+    }),
+
+  updateItemQuantity: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        itemId: z.string(),
+        quantity: z.number(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.celdaItem.update({
+        where: {
+          celdaId_itemId: {
+            celdaId: input.id,
+            itemId: input.itemId,
+          },
+        },
+        data: {
+          quantity: input.quantity,
+        },
+      });
+    }),
 });
