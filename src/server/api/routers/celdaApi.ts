@@ -97,16 +97,12 @@ export const celdaRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        itemId: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {
       return ctx.prisma.celdaItem.delete({
         where: {
-          celdaId_itemId: {
-            celdaId: input.id,
-            itemId: input.itemId,
-          },
+          id: input.id,
         },
       });
     }),
@@ -115,17 +111,13 @@ export const celdaRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        itemId: z.string(),
         quantity: z.number(),
       })
     )
     .mutation(({ input, ctx }) => {
       return ctx.prisma.celdaItem.update({
         where: {
-          celdaId_itemId: {
-            celdaId: input.id,
-            itemId: input.itemId,
-          },
+          id: input.id,
         },
         data: {
           quantity: input.quantity,

@@ -42,6 +42,7 @@ const ManageCelda: NextPage = () => {
 
   const [celdaItemsData, setCeldaItemsData] = useState<
     {
+      id: string;
       itemId: string;
       name: string;
       quantity: number;
@@ -52,12 +53,13 @@ const ManageCelda: NextPage = () => {
     if (isLoadingCelda || isLoadingItems || errorCelda || errorItems) return;
 
     const celdaItems = celda?.CeldaItem?.map((celdaItem) => ({
+      id: celdaItem.id,
       itemId: celdaItem.itemId,
       name: items.find((item) => item.id === celdaItem.itemId)?.name ?? "",
       quantity: celdaItem.quantity,
     }));
 
-    console.log(celdaItems);
+    console.log("celdaItems", celdaItems);
     console.log(items);
 
     setCeldaItemsData(celdaItems ?? []);
@@ -131,32 +133,30 @@ const ManageCelda: NextPage = () => {
     quantity = 0;
   };
 
-  const handleRemoveItemFromCelda = async ({ itemId }: { itemId: string }) => {
-    console.log("itemId", itemId, "id", id);
+  const handleRemoveItemFromCelda = async (celdaItemId: string) => {
+    console.log("celdaItemId", celdaItemId);
     await mutateAsyncRemoveItemFromCelda({
-      id: id,
-      itemId: itemId,
+      id: celdaItemId,
     });
     await utils.celda.getAll.invalidate();
     await utils.celda.getOne.invalidate({ id: id });
-    itemId = "";
+    celdaItemId = "";
   };
 
   const handleUpdateItemFromCelda = async ({
-    itemId,
+    celdaItemId,
     quantity,
   }: {
-    itemId: string;
+    celdaItemId: string;
     quantity: number;
   }) => {
     await mutateAsyncUpdateItemFromCelda({
-      id: id,
-      itemId: itemId,
+      id: celdaItemId,
       quantity: quantity,
     });
     await utils.celda.getAll.invalidate();
     await utils.celda.getOne.invalidate({ id: id });
-    itemId = "";
+    celdaItemId = "";
     quantity = 0;
   };
 
@@ -239,9 +239,9 @@ const ManageCelda: NextPage = () => {
                           <button
                             className="rounded-full bg-red-400 px-3 py-2 font-bold text-white hover:bg-red-700"
                             onClick={() =>
-                              void handleRemoveItemFromCelda({
-                                itemId: celdaItem.itemId,
-                              })
+                              void handleRemoveItemFromCelda(
+                              celdaItem.id,
+                              )
                             }
                           >
                             Eliminar
@@ -283,15 +283,15 @@ const ManageCelda: NextPage = () => {
                         quantity: 0,
                       }}
                       onSubmit={async (values, { setSubmitting }) => {
-                        if (
-                          celdaItemsData.some((celdaItem) => {
-                            if (celdaItem.itemId === item.id) {
-                              return true;
-                            }
-                          })
-                        ) {
+                        const celdaItem = celdaItemsData.find((celdaItem) => {
+                          if (celdaItem.itemId === item.id) {
+                            return true;
+                          }
+                        });
+
+                        if (celdaItem) {
                           await handleUpdateItemFromCelda({
-                            itemId: item.id,
+                            celdaItemId: celdaItem.id,
                             quantity: values.quantity,
                           });
                           setSubmitting(false);
