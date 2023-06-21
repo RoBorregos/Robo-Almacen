@@ -28,6 +28,11 @@ const Grid: NextPage = () => {
     column: number;
   }>({ name: "", id: "", row: 0, column: 0 });
 
+  const [selectedModal, setSelectedModal] = useState<{
+    row: number;
+    column: number;
+  }>({ row: -1, column: -1 });
+
   const [grid, setGrid] = useState(gridData);
 
   const {
@@ -149,7 +154,7 @@ const Grid: NextPage = () => {
 
   return (
     <Layout>
-      <div className="-z-0 row-auto mt-16 grid min-h-[90vh] w-full grid-flow-row overflow-x-auto">
+      <div className="-z-0 row-auto mt-16 grid min-h-[90vh] w-full grid-flow-row overflow-x-auto overflow-y-clip">
         {/* Render the grid */}
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="col-auto grid grid-flow-col">
@@ -161,7 +166,7 @@ const Grid: NextPage = () => {
                 {cell.id !== "" ? (
                   <div>
                     <button
-                      className="rounded-full bg-blue-400 px-2 py-1 font-bold text-white hover:bg-blue-700"
+                      className="rounded-full bg-blue-400 px-2 py-1 font-bold text-white hover:bg-blue-700 transition ease-in-out delay-10 hover:scale-150 duration-300"
                       // popovertarget={cell.id}
                       onClick={() => {
                         console.log("cell", cell);
@@ -169,8 +174,10 @@ const Grid: NextPage = () => {
                         const dialog = document.getElementById(
                           cell.id
                         ) as HTMLDialogElement;
-                        if (dialog && !dialog.open) {
-                          dialog.show();
+                        if (dialog) {
+                          selectedModal.column === cellIndex && selectedModal.row === rowIndex ? setSelectedModal({ row: -1, column: -1 }) : setSelectedModal({ row: rowIndex, column: cellIndex });
+                          dialog.open ? dialog.close() : dialog.show();
+                          console.log("selectedModal", selectedModal);
                         }
                       }}
                       disabled={selectedCell.id !== ""}
@@ -179,13 +186,15 @@ const Grid: NextPage = () => {
                     </button>
 
                     <div className="relative">
+                    {/* <div className={"relative" + (selectedModal.column === cellIndex && selectedModal.row === rowIndex ? " visible transition ease-in-out delay-150 bg-blue-500 -translate-y-1 scale-110 duration-300" : " ")} > */}
                       <dialog
                         className={
-                          "absolute right-9 rounded-lg bg-white p-5 shadow-md" +
+                          "absolute right-9 rounded-lg bg-white p-5 shadow-lg shadow-cyan-500/50 " +
                           (rowIndex > gridHeight / 2 - 1
-                            ? " bottom-12"
+                            ? " bottom-16"
                             : " top-5") +
-                          (cellIndex > gridWidth / 2 ? " right-12" : " left-12")
+                          (cellIndex > gridWidth / 2 ? " right-12" : " left-12") +
+                          (selectedModal.column === cellIndex && selectedModal.row === rowIndex ? " visible transition ease-in-out delay-0 bg-blue-500 -translate-y-1 scale-110 duration-200" : " ")
                         }
                         id={cell.id}
                       >
@@ -247,7 +256,7 @@ const Grid: NextPage = () => {
                   </div>
                 ) : selectedCell.name === "" ? (
                   <button
-                    className="invisible rounded-full bg-blue-400 px-3 py-1 font-bold text-white hover:bg-blue-700 group-hover:visible"
+                    className="invisible rounded-full bg-blue-400 px-3 py-1 font-bold text-white hover:bg-blue-700 group-hover:visible group-hover:transition group-hover:ease-in-out group-hover:delay-10 group-hover:scale-125 group-hover:duration-150"
                     onClick={() => {
                       void handleCreateCelda(rowIndex, cellIndex);
                     }}
