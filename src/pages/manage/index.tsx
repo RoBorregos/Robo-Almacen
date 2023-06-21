@@ -113,7 +113,7 @@ const Grid: NextPage = () => {
     newRow[cell.column] = { name: "", id: "", row: 0, column: 0 };
 
     setGrid(newGrid);
-    
+
     await mutateAsyncCeldaDelete(cell.id);
     await utils.celda.getAll.invalidate();
   };
@@ -128,12 +128,12 @@ const Grid: NextPage = () => {
     prevColumn: number
   ) => {
     const newGrid = [...grid];
-  
+
     const newRow = newGrid[prevRow] ? newGrid[prevRow] : undefined;
     if (newRow === undefined) return;
-  
+
     newRow[prevColumn] = { name: "", id: "", row: 0, column: 0 };
-  
+
     setGrid(newGrid);
 
     setSelectedCell({ name: "", id: "", row: 0, column: 0 });
@@ -146,10 +146,10 @@ const Grid: NextPage = () => {
     });
     await utils.celda.getAll.invalidate();
   };
-  
+
   return (
     <Layout>
-      <div className="row-auto mt-16 grid min-h-[90vh] w-full grid-flow-row overflow-x-auto">
+      <div className="-z-0 row-auto mt-16 grid min-h-[90vh] w-full grid-flow-row overflow-x-auto">
         {/* Render the grid */}
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="col-auto grid grid-flow-col">
@@ -162,44 +162,87 @@ const Grid: NextPage = () => {
                   <div>
                     <button
                       className="rounded-full bg-blue-400 px-2 py-1 font-bold text-white hover:bg-blue-700"
-                      popovertarget={cell.id}
+                      // popovertarget={cell.id}
                       onClick={() => {
                         console.log("cell", cell);
+                        // document.getElementById(cell.id)?.showModal();
+                        const dialog = document.getElementById(
+                          cell.id
+                        ) as HTMLDialogElement;
+                        if (dialog && !dialog.open) {
+                          dialog.show();
+                        }
                       }}
                       disabled={selectedCell.id !== ""}
                     >
                       {cell.name}
                     </button>
-                    <div
-                      popover="true"
-                      id={cell.id}
-                      className="relative rounded bg-slate-100"
-                    >
-                      <div className="flex flex-col gap-2">
-                        <button
-                          className="rounded-full bg-yellow-400 px-5 py-3 font-bold text-white hover:bg-yellow-600"
-                          onClick={() => {
-                            console.log("cell", cell);
-                            void router.push(`/manage/${cell.id}`);
-                          }}
-                        >
-                          {"Actualizar " + cell.name}
-                        </button>
-                        <button
-                          className="rounded-full bg-red-400 px-5 py-3 font-bold text-white hover:bg-red-700"
-                          onClick={() => void handleDeleteCelda(cell)}
-                          popovertarget={cell.id}
-                        >
-                          Borrar Celda
-                        </button>
-                        <button
-                          className="rounded-full bg-green-400 px-5 py-3 font-bold text-white hover:bg-green-700"
-                          onClick={() => setSelectedCell(cell)}
-                          popovertarget={cell.id}
-                        >
-                          Mover Celda
-                        </button>
-                      </div>
+
+                    <div className="relative">
+                      <dialog
+                        className={
+                          "absolute right-9 rounded-lg bg-white p-5 shadow-md" +
+                          (rowIndex > gridHeight / 2 - 1
+                            ? " bottom-12"
+                            : " top-5") +
+                          (cellIndex > gridWidth / 2 ? " right-12" : " left-12")
+                        }
+                        id={cell.id}
+                      >
+                        <div className="flex flex-col gap-2">
+                          <button
+                            className="rounded-full bg-yellow-400 px-5 py-3 font-bold text-white hover:bg-yellow-600"
+                            onClick={() => {
+                              console.log("cell", cell);
+                              void router.push(`/manage/${cell.id}`);
+                            }}
+                          >
+                            {"Actualizar " + cell.name}
+                          </button>
+                          <button
+                            className="rounded-full bg-red-400 px-5 py-3 font-bold text-white hover:bg-red-700"
+                            onClick={() => {
+                              void handleDeleteCelda(cell);
+                              const dialog = document.getElementById(
+                                cell.id
+                              ) as HTMLDialogElement;
+                              if (dialog) {
+                                dialog.close();
+                              }
+                            }}
+                          >
+                            Borrar Celda
+                          </button>
+                          <button
+                            className="rounded-full bg-blue-400 px-5 py-3 font-bold text-white hover:bg-blue-700"
+                            onClick={() => {
+                              setSelectedCell(cell);
+                              const dialog = document.getElementById(
+                                cell.id
+                              ) as HTMLDialogElement;
+                              if (dialog) {
+                                dialog.close();
+                              }
+                            }}
+                          >
+                            Mover Celda
+                          </button>
+
+                          <button
+                            className="rounded-full bg-green-400 px-5 py-3 font-bold text-white hover:bg-green-700"
+                            onClick={() => {
+                              const dialog = document.getElementById(
+                                cell.id
+                              ) as HTMLDialogElement;
+                              if (dialog) {
+                                dialog.close();
+                              }
+                            }}
+                          >
+                            Cerrar
+                          </button>
+                        </div>
+                      </dialog>
                     </div>
                   </div>
                 ) : selectedCell.name === "" ? (
