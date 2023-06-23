@@ -4,11 +4,19 @@ import * as React from "react";
 import { Item } from "@prisma/client";
 import GenButton from "../buttons/GenericButton";
 
-const BlurImage = ({ item, type }: { item: Item; type: string }) => {
-  const displayType: { [key: string]: string } = {
-    row: "h-1/3 w-1/3",
-    column: "aspect-square",
-  };
+
+const displayType: { [key: string]: string } = {
+  row: "h-1/3 w-1/3",
+  column: "aspect-square",
+};
+
+const BlurImage = ({
+  item,
+  type = "column",
+}: {
+  item: Item;
+  type?: string;
+}) => {
   return (
     <div className={`group/item relative ${displayType[type]}`}>
       <img
@@ -22,12 +30,12 @@ const BlurImage = ({ item, type }: { item: Item; type: string }) => {
       </h1>
       <GenButton
         title="Más información"
-        className="absolute bottom-2 left-2 text-red-500 opacity-0 duration-300 group-hover/item:opacity-100"
+        className="absolute bottom-2 left-2 opacity-0 duration-300 group-hover/item:opacity-100"
       />
       <GenButton
         color="violet"
         title="Pedir"
-        className="absolute bottom-2 right-2 text-green-500 opacity-0 duration-300 group-hover/item:opacity-100"
+        className="absolute bottom-2 right-2 opacity-0 duration-300 group-hover/item:opacity-100"
       />
     </div>
   );

@@ -7,8 +7,6 @@ import StickyHeadTable from "rbgs/components/general/ListDisplay";
 import ItemDisplay, {
   ItemDisplayStyle,
 } from "rbgs/components/general/ItemDisplay";
-import ExButton from "rbgs/components/buttons/ExButton";
-import GenButton from "rbgs/components/buttons/GenericButton";
 
 const activos: ItemDisplayStyle = {
   columns: 1,
@@ -40,10 +38,13 @@ const Dashboard: NextPage = () => {
   const { data: articulos, isLoading } = api.general.getAllItems.useQuery();
 
   // Copia temporal de los articulos
-  const arts = [...articulos];
-  arts?.map((articulo) => {
-    return arts.push(articulo);
-  });
+  let arts;
+  if (articulos !== undefined) {
+    arts = [...articulos];
+    arts?.map((articulo) => {
+      return arts.push(articulo);
+    });
+  }
 
   return (
     <Layout>
