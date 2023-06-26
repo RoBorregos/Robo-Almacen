@@ -1,0 +1,58 @@
+import * as React from "react";
+import { Item, Prestamo } from "@prisma/client";
+import GenButton from "../buttons/GenericButton";
+
+const displayType: { [key: string]: string } = {
+  row: "h-1/3 w-1/3",
+  column: "aspect-square",
+};
+
+const BlurImagePrestamo = ({
+  prestamo,
+  type = "column",
+}: {
+  prestamo: Prestamo & { CeldaItem: { Item: Item } };
+  type?: string;
+}) => {
+  const item: Item = prestamo.CeldaItem.Item;
+
+  return (
+    <div
+      className={`group/item relative ${displayType[type]}`}
+      key={prestamo.id}
+    >
+      <img
+        className="aspect-square opacity-100 duration-300 hover:opacity-80"
+        src={item.imgPath}
+        alt={item.name}
+        key={item.name}
+      />
+      <div className="absolute top-0 w-full text-center text-white duration-300">
+        <h1 className="bg-black/50">
+          {prestamo?.finalDate
+            ? "Fecha final: " + prestamo.finalDate?.toDateString()
+            : "Fecha de inicio: " + prestamo.initialDate?.toDateString()}
+        </h1>
+        <h2 className="pl-3 text-left font-bold opacity-0 duration-300 group-hover/item:bg-black/50 group-hover/item:opacity-100">
+          {item.name}, Cantidad: {prestamo.quantity}
+        </h2>
+      </div>
+
+      {prestamo.returned ? (
+        <GenButton
+          title="Ver préstamos de material"
+          size="large"
+          className="right-1/2 translate-x-1/2 bottom-2 absolute opacity-0 duration-300 group-hover/item:opacity-100"
+        />
+      ) : (
+        <GenButton
+          title="Devolver"
+          size="large"
+          className="right-1/2 translate-x-1/2 absolute bottom-2 opacity-0 duration-300 group-hover/item:opacity-100"
+        />
+      )}
+    </div>
+  );
+};
+
+export default BlurImagePrestamo;

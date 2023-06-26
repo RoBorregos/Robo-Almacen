@@ -1,24 +1,22 @@
-import { AiFillCheckCircle } from "react-icons/ai";
-import { ImCross } from "react-icons/im";
 import * as React from "react";
-import { Item } from "@prisma/client";
+import { Item, Prestamo } from "@prisma/client";
 import GenButton from "../buttons/GenericButton";
-
 
 const displayType: { [key: string]: string } = {
   row: "h-1/3 w-1/3",
   column: "aspect-square",
 };
 
-const BlurImage = ({
+const BlurImageItem = ({
   item,
   type = "column",
 }: {
   item: Item;
   type?: string;
 }) => {
+
   return (
-    <div className={`group/item relative ${displayType[type]}`}>
+    <div className={`group/item relative ${displayType[type]}`} key={item.id}>
       <img
         className="aspect-square opacity-100 duration-300 hover:opacity-80"
         src={item.imgPath}
@@ -41,4 +39,4 @@ const BlurImage = ({
   );
 };
 
-export default BlurImage;
+export default BlurImageItem;
