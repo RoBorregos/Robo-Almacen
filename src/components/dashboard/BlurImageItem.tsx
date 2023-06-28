@@ -1,6 +1,8 @@
 import * as React from "react";
 import { Item, Prestamo } from "@prisma/client";
 import GenButton from "../buttons/GenericButton";
+import { api } from "rbgs/utils/api";
+import { generateRandomItem } from "rbgs/utils/generateData";
 
 const displayType: { [key: string]: string } = {
   row: "h-1/3 w-1/3",
@@ -14,17 +16,17 @@ const BlurImageItem = ({
   item: Item;
   type?: string;
 }) => {
-
+  
   return (
-    <div className={`group/item relative ${displayType[type]}`} key={item.id}>
+    <div className={`group/item relative ${displayType[type]}`} key={item?.id}>
       <img
         className="aspect-square opacity-100 duration-300 hover:opacity-80"
-        src={item.imgPath}
-        alt={item.name}
-        key={item.name}
+        src={item?.imgPath}
+        alt={item?.name}
+        key={item?.name}
       />
       <h1 className="absolute top-0 h-1/6 w-full bg-black/50 text-center text-white opacity-0 duration-300 group-hover/item:opacity-100">
-        {item.name}
+        {item?.name}
       </h1>
       <GenButton
         title="Más información"

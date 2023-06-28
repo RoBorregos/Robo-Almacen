@@ -1,7 +1,4 @@
 // Script used to generate data for tests
-
-import { api } from "rbgs/utils/api";
-
 import { faker } from "@faker-js/faker";
 
 import {
@@ -15,7 +12,7 @@ import {
 
 // Functions to generate random objects of each type.
 
-function generateRandomItem(): Item {
+export function generateRandomItem(): Item {
   return {
     id: faker.string.uuid(),
     name: faker.commerce.productName(),
@@ -28,7 +25,7 @@ function generateRandomItem(): Item {
   };
 }
 
-function generateRandomUser(): User {
+export function generateRandomUser(): User {
   let firstName = faker.person.firstName();
   let lastName = faker.person.lastName();
   let name = firstName + " " + lastName;
@@ -42,7 +39,7 @@ function generateRandomUser(): User {
 }
 
 // Al usar, reasignar celdaItemId y userId a valores válidos.
-function generateRandomPrestamo(): Prestamo {
+export function generateRandomPrestamo(): Prestamo {
   return {
     id: faker.string.uuid(),
     createdAt: faker.date.past(),
@@ -56,7 +53,7 @@ function generateRandomPrestamo(): Prestamo {
   };
 }
 
-function generateRandomCelda(): Celda {
+export function generateRandomCelda(): Celda {
   return {
     id: faker.string.uuid(),
     createdAt: faker.date.past(),
@@ -67,7 +64,7 @@ function generateRandomCelda(): Celda {
   };
 }
 
-function generateRandomCeldaItem(): CeldaItem {
+export function generateRandomCeldaItem(): CeldaItem {
   return {
     id: faker.string.uuid(),
     createdAt: faker.date.past(),

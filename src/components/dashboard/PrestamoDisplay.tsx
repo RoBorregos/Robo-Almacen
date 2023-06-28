@@ -17,50 +17,19 @@ const displayType: { [key: string]: string } = {
 };
 
 const PrestamoDisplay = ({
-  itemsIds,
+  type = "activo",
   style,
 }: {
-  itemsIds: { id: string }[] | undefined;
+  type: string;
   style: ItemDisplayStyle;
 }) => {
   const [searchInput, setSearchInput] = useState("");
   const [visible, setVisible] = useState(true);
 
-  const allData: (Prestamo & { CeldaItem: { Item: Item } })[] = [];
-
-  // Conseguir todos los items, a partir de los ids
-  itemsIds?.map((item) => {
-    const { data: prestamo } =
-      api.general.getPrestamoDetailsById.useQuery(item);
-
-    if (prestamo !== undefined && prestamo !== null) {
-      allData?.push(prestamo);
-    }
+  const {data: prestamos, isLoading } = api.general.getPrestamosSearch.useQuery({
+    search: searchInput,
+    type: type,
   });
-
-  const handleSearch = (e: React.FormEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setSearchInput((e.target as HTMLInputElement).value);
-  };
-
-  let it: (Prestamo & { CeldaItem: { Item: Item } })[] | undefined;
-
-  // Todo: Cambiar esto para que se haga de manera efectiva.
-  if (searchInput.length > 0) {
-    const search = searchInput.toLowerCase();
-    it = allData?.filter((item) => {
-      // Filtrar usando atributos de pedido
-      return (
-        item.CeldaItem.Item.name?.toLowerCase().includes(search) ||
-        item.CeldaItem.Item.category?.toLowerCase().includes(search) ||
-        item.CeldaItem.Item.description?.toLowerCase().includes(search) ||
-        item.CeldaItem.Item.imgPath?.toLowerCase().includes(search) ||
-        item.CeldaItem.Item.department?.toLowerCase().includes(search)
-      );
-    });
-  } else {
-    it = allData;
-  }
 
   return (
     <div className="m-4">
@@ -73,7 +42,7 @@ const PrestamoDisplay = ({
           className="w-[80%] basis-full rounded-md bg-slate-500 px-4 py-2 text-white"
           type="text"
           value={searchInput}
-          onChange={handleSearch}
+          onChange={(e) => setSearchInput(e.target.value)}
           placeholder={style?.placeHolder ? style.placeHolder : "Buscar..."}
         />
       )}
@@ -89,7 +58,7 @@ const PrestamoDisplay = ({
           onClick={() => setVisible(true)}
         />
       )}
-      {visible && (
+      {(!isLoading && visible) && (
         <div
           className={`${
             displayType[style.type]
@@ -97,8 +66,9 @@ const PrestamoDisplay = ({
             colorVariants[style.color]
           } `}
         >
-          {it.map((item, id) => {
-            return BlurImagePrestamo({ prestamo: item, type: style?.type });
+          {prestamos?.map((prestamo) => {
+            if (prestamo !== null && prestamo !== undefined)
+             return BlurImagePrestamo({ prestamo: prestamo, type: style?.type });
           })}
         </div>
       )}

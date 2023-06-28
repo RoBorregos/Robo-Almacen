@@ -25,52 +25,18 @@ const displayType: { [key: string]: string } = {
   column: "flex-col",
 };
 
-const ItemDisplay = ({
-  itemsIds,
-  style,
-}: {
-  itemsIds: { id: string }[] | undefined;
-  style: ItemDisplayStyle;
-}) => {
+const ItemDisplay = ({ style }: { style: ItemDisplayStyle }) => {
   const [searchInput, setSearchInput] = useState("");
   const [visible, setVisible] = useState(true);
 
-  const allData: Item[] = [];
-
-  // Conseguir todos los items, a partir de los ids
-  itemsIds?.map((item) => {
-    let nextItem: Item | null | undefined;
-
-    const { data: articulo } = api.general.getItemById.useQuery(item);
-
-    if (articulo !== undefined && articulo !== null) {
-      allData?.push(articulo);
-    }
+  const { data: items, isLoading } = api.general.getItemsSearch.useQuery({
+    search: searchInput,
   });
-
-  const handleSearch = (e: React.FormEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setSearchInput((e.target as HTMLInputElement).value);
-  };
-
-  let it: Item[] | undefined;
-
-  // Todo: Cambiar esto para que se haga de manera efectiva.
-  if (searchInput.length > 0) {
-    const search = searchInput.toLowerCase();
-    it = allData?.filter((item) => {
-      // Filtrar usando atributos de item
-      return (
-        item.name?.toLowerCase().includes(search) ||
-        item.category?.toLowerCase().includes(search) ||
-        item.description?.toLowerCase().includes(search) ||
-        item.imgPath?.toLowerCase().includes(search) ||
-        item.department?.toLowerCase().includes(search)
-      );
-    });
-  } else {
-    it = allData;
-  }
+  // return (
+  //   <div className="m-4">
+  //     e
+  //     </div>
+  // );
 
   return (
     <div className="m-4">
@@ -83,7 +49,7 @@ const ItemDisplay = ({
           className="w-[80%] basis-full rounded-md bg-slate-500 px-4 py-2 text-white"
           type="text"
           value={searchInput}
-          onChange={handleSearch}
+          onChange={(e) => setSearchInput(e.target.value)}
           placeholder={style?.placeHolder ? style.placeHolder : "Buscar..."}
         />
       )}
@@ -99,8 +65,8 @@ const ItemDisplay = ({
           onClick={() => setVisible(true)}
         />
       )}
-
-      {visible && (
+      
+      {(!isLoading && visible) && (
         <div
           className={`${
             displayType[style.type]
@@ -108,8 +74,8 @@ const ItemDisplay = ({
             colorVariants[style.color]
           } `}
         >
-          {it?.map((item, id) => {
-            return BlurImageItem({ item, type: style?.type });
+          {items?.map((item, id) => {
+            return BlurImageItem({ item: item, type: style?.type });
           })}
         </div>
       )}
