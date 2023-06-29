@@ -1,6 +1,8 @@
 import * as React from "react";
-import { Item, Prestamo } from "@prisma/client";
+import { useRouter } from "next/router";
+import { Item } from "@prisma/client";
 import GenButton from "../buttons/GenericButton";
+import { api } from "rbgs/utils/api";
 
 const displayType: { [key: string]: string } = {
   row: "h-1/3 w-1/3",
@@ -8,16 +10,18 @@ const displayType: { [key: string]: string } = {
 };
 
 const BlurImagePrestamo = ({
-  prestamo,
+  idPrestamo,
   type = "column",
 }: {
-  prestamo: Prestamo & { CeldaItem: { Item: Item } };
+  idPrestamo: string;
   type?: string;
 }) => {
-  // const { data: prestamo } = api.general.getPrestamoDetailsById.useQuery({
-  //   id: idPrestamo,
-  // });
+  const { data: prestamo } = api.general.getPrestamoDetailsById.useQuery({
+    id: idPrestamo,
+  });
   const item: Item | undefined = prestamo?.CeldaItem.Item;
+
+  const router = useRouter();
 
   return (
     <div
@@ -46,6 +50,7 @@ const BlurImagePrestamo = ({
           title="Ver préstamos de material"
           size="large"
           className="absolute bottom-2 right-1/2 translate-x-1/2 opacity-0 duration-300 group-hover/item:opacity-100"
+          onclick={() => {router.push(`/dashboard/${item?.id}`)}}
         />
       ) : (
         <GenButton

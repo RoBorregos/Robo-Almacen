@@ -1,4 +1,3 @@
-import { Item, Prestamo, CeldaItem } from "@prisma/client";
 import { api } from "rbgs/utils/api";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import React, { useState } from "react";
@@ -29,14 +28,9 @@ const ItemDisplay = ({ style }: { style: ItemDisplayStyle }) => {
   const [searchInput, setSearchInput] = useState("");
   const [visible, setVisible] = useState(true);
 
-  const { data: items, isLoading } = api.general.getItemsSearch.useQuery({
+  const { data: items, isLoading } = api.general.getItemsId.useQuery({
     search: searchInput,
   });
-  // return (
-  //   <div className="m-4">
-  //     e
-  //     </div>
-  // );
 
   return (
     <div className="m-4">
@@ -65,8 +59,8 @@ const ItemDisplay = ({ style }: { style: ItemDisplayStyle }) => {
           onClick={() => setVisible(true)}
         />
       )}
-      
-      {(!isLoading && visible) && (
+
+      {!isLoading && visible && (
         <div
           className={`${
             displayType[style.type]
@@ -74,9 +68,9 @@ const ItemDisplay = ({ style }: { style: ItemDisplayStyle }) => {
             colorVariants[style.color]
           } `}
         >
-          {items?.map((item, id) => {
-            return BlurImageItem({ item: item, type: style?.type });
-          })}
+          {items?.map((item, id) => (
+            <BlurImageItem itemId={item.id} type={style?.type} key={item.id} />
+          ))}
         </div>
       )}
     </div>

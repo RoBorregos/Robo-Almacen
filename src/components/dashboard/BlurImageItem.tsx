@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Item, Prestamo } from "@prisma/client";
+import { useRouter } from "next/router";
 import GenButton from "../buttons/GenericButton";
 import { api } from "rbgs/utils/api";
 import { generateRandomItem } from "rbgs/utils/generateData";
@@ -10,13 +10,18 @@ const displayType: { [key: string]: string } = {
 };
 
 const BlurImageItem = ({
-  item,
+  itemId,
   type = "column",
 }: {
-  item: Item;
+  itemId: string;
   type?: string;
 }) => {
-  
+  const { data: item } = api.general.getItemById.useQuery({
+    id: itemId,
+  });
+
+  const router = useRouter();
+
   return (
     <div className={`group/item relative ${displayType[type]}`} key={item?.id}>
       <img

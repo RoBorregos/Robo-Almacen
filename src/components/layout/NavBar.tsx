@@ -12,8 +12,8 @@ const NavBar = ({
       <div className="flex-1 flex items-center justify-center">
         <div className="flex mb-0">
           <ul className="flex items-center">
-          <img src="Logo2.svg" alt="Logo" style={{ width: "70px", height: "50px" }}/>
-          <img src="Letras.png" alt ="Letras" style={{ width: "180px", height: "30px" }} mr-16/>
+          <img src="/Logo2.svg" alt="Logo" style={{ width: "70px", height: "50px" }}/>
+          <img src="/Letras.png" alt ="Letras" style={{ width: "180px", height: "30px" }} mr-16/>
             {routes.map((route) => (
               <li className="mr-6 inline-block" key={route.name}>
                 <a className={color} href={route.path}>
