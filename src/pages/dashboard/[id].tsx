@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import DropDown from "rbgs/components/dashboard/DropDown";
 import ItemCard from "rbgs/components/dashboard/ItemCard";
+import PrestamoCard from "rbgs/components/dashboard/PrestamoCard";
 import Layout from "rbgs/components/layout/Layout";
 import { api } from "rbgs/utils/api";
 import { useState } from "react";
@@ -43,7 +44,7 @@ const ViewPrestamo: NextPage = () => {
           Resumen general de {item?.name}
         </h1>
 
-        <div className="flex flex-row">
+        <div className="flex flex-col md:flex-row">
           <div className="m-4 flex flex-col">
             {isLoadingItemsD ? (
               <h1>Cargando Dropdown...</h1>
@@ -64,25 +65,13 @@ const ViewPrestamo: NextPage = () => {
           {item && <ItemCard item={item} />}
         </div>
         <div className="flex flex-row items-center justify-center gap-4">
-          {isLoadingPrestamo ? (
+          {isLoadingPrestamo || !item ? (
             <p className="text-center text-2xl font-bold text-white">
               Cargando...
             </p>
           ) : (
-            prestamos?.map((prestamo, id) => (
-              <div className="bg-slate-400 p-5 text-neutral-800" key={id}>
-                <ul>
-                  <li>
-                    Fecha de préstamo: {prestamo.createdAt.toDateString()}
-                  </li>
-                  <li>
-                    Fecha de devolución: {prestamo.finalDate?.toDateString()}
-                  </li>
-                  <li> Cantidad: {prestamo.quantity} </li>
-                  <li> Usuario: {prestamo.User.name} </li>
-                  <li> Correo de usuario: {prestamo.User?.email} </li>
-                </ul>
-              </div>
+            prestamos?.map((prestamo) => (
+                <PrestamoCard prestamo={prestamo} key={prestamo.id} itemData={{name: item.name, imgPath: item.imgPath}} />
             ))
           )}
         </div>

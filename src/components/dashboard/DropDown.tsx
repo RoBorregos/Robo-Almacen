@@ -15,7 +15,7 @@ const DropDown = ({
   const handleToggle = () => setOpen(!open);
 
   return (
-    <div className="relative my-4 inline rounded-md bg-slate-500 pl-8 text-base lg:pb-4 lg:pl-12 lg:text-lg">
+    <div className="relative my-4 inline rounded-md bg-slate-500 pl-8 pr-2 text-base lg:pb-4 lg:pl-12 lg:text-lg">
       {open ? (
         <IoIosArrowDropup
           onClick={handleToggle}
@@ -34,7 +34,7 @@ const DropDown = ({
           <Link
             href={`/dashboard/${item.id}`}
             key={id}
-            className="block px-4 py-2 text-sm text-white hover:bg-slate-400"
+            className="duration-300 block px-4 py-2 text-sm text-white hover:bg-slate-400"
           >
             <li>{item.name}</li>
           </Link>

@@ -17,14 +17,17 @@ const ItemCard = ({ item }: { item: Item | null | undefined }) => {
   }
 
   return (
-    <div className="flex flex-row flex-wrap">
-      <img
-        className="aspect-square max-h-60"
-        src={"/" + item?.imgPath}
-        alt={item?.name}
-        key={item?.name}
-      />
-      <div className="w-3/6 break-words bg-slate-400 p-5 text-neutral-800">
+    <div className="flex flex-col md:flex-row">
+      <div className="inline h-56 w-56">
+        <img
+          className="aspect-square"
+          src={"/" + item?.imgPath}
+          alt={item?.name}
+          key={item?.name}
+        />
+      </div>
+
+      <div className="break-words bg-slate-400 p-5 text-neutral-800">
         <ul>
           <li>
             {" "}
