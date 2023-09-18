@@ -25,7 +25,7 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
     const { mutateAsync: createUser } = api.userData.createUser.useMutation();
     const { mutateAsync: updateUser } = api.userData.updateUser.useMutation();
     const { mutateAsync: updateHasSeen } = api.userData.updateHasData.useMutation();
-    
+
     const { data } = api.userData.hasData.useQuery({
         userId: userId,
     });
