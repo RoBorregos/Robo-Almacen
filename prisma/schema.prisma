@@ -1,69 +1,148 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
 }
 
 datasource db {
-    provider = "postgresql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Example {
-    id        String   @id @default(cuid())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-// Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    ext_expires_in    Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  ext_expires_in    Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
+  id            String     @id @default(cuid())
+  name          String?
+  email         String?    @unique
+  emailVerified DateTime?
+  image         String?
+  hasData      Boolean    @default(false)
+  accounts      Account[]
+  Prestamo      Prestamo[]
+  sessions      Session[]
+  UserData      UserData?
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Celda {
+  id        String      @id
+  createdAt DateTime    @default(now())
+  updatedAt DateTime
+  name      String
+  row       Int
+  column    Int
+  CeldaItem CeldaItem[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CeldaItem {
+  id        String     @id
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+  quantity  Int
+  available Int
+  celdaId   String
+  itemId    String
+  Celda     Celda      @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+  Item      Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  Prestamo  Prestamo[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Item {
+  id          String      @id
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
+  name        String
+  description String
+  category    String
+  department  String
+  imgPath     String      @default("")
+  CeldaItem   CeldaItem[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Prestamo {
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  initialDate DateTime
+  finalDate   DateTime?
+  quantity    Int
+  celdaItemId String
+  userId      String
+  returned    Boolean   @default(false)
+  CeldaItem   CeldaItem @relation(fields: [celdaItemId], references: [id], onDelete: Cascade)
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Telemetry {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  name      String
+  value     String
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model User2 {
+  id       String @id
+  name     String
+  email    String
+  major    String
+  semester String
+  phone    String
+  area     String
+}
+
+model UserData {
+  id       String @id
+  major    String?
+  semester Int?
+  phone   String?
+  area    String?
+  image   String?
+  
+  user    User   @relation(fields: [id], references: [id], onDelete: Cascade)
 }
