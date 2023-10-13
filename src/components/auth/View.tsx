@@ -1,4 +1,3 @@
-import { useSession } from "next-auth/react";
 import { api } from "rbgs/utils/api";
 import ViewElement from "./ViewElement";
 import Avatar from "./Avatar";

@@ -1,4 +1,3 @@
-import { CldUploadButton } from "next-cloudinary";
 import Image from 'next/image';
 import { MdModeEdit } from "react-icons/md";
 

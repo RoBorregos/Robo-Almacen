@@ -1,11 +1,22 @@
-import { Form, Formik, useFormikContext } from "formik";
-import { useSession } from "next-auth/react";
+import { Form, Formik } from "formik";
 import { CldUploadButton } from "next-cloudinary";
 import Input from "rbgs/components/auth/Input";
 import { api } from "rbgs/utils/api";
-import { useCallback, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Avatar from "./Avatar";
 import User from "./User";
+import { string } from "zod";
+
+interface CldUploadWidgetResults {
+    event?: string;
+    info?: ob | undefined | string;
+}
+
+interface ob {
+    secure_url?: string;
+    string?: string;
+
+}
 
 
 interface FormProps {
@@ -26,6 +37,7 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
     const { mutateAsync: updateUser } = api.userData.updateUser.useMutation();
     const { mutateAsync: updateHasSeen } = api.userData.updateHasData.useMutation();
 
+
     const { data } = api.userData.hasData.useQuery({
         userId: userId,
     });
@@ -34,6 +46,7 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
     const { data: userData } = api.userData.getUserData.useQuery({
         id: userId,
     });
+
     const [image, setImage] = useState<string>(userData?.image || 'Logo2.svg');
 
 
@@ -55,8 +68,13 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
 
 
 
-    const handleUpload = (result: any) => {
-        setImage(result?.info?.secure_url);
+ 
+
+    const handleUpload = (result: CldUploadWidgetResults) => {
+        if (typeof result?.info !== 'string')
+            setImage(result?.info?.secure_url || 'Logo2.svg');
+        else    
+            console.log(result?.info);
     }
 
 
@@ -65,15 +83,18 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
 
             if (data?.hasData) {
 
-                const asd = await updateUser({
+                await updateUser({
                     major: values.major, semester: Number(values.semester), phone: values.phone, area: values.area, image: image, userId: userId
                 });
 
             } else {
-                const asd = await createUser({
+                await createUser({
                     major: values.major, semester: Number(values.semester), phone: values.phone, area: values.area, image: image, userId: userId
                 });
-                const update = updateHasSeen({ userId: userId });
+                updateHasSeen({ userId: userId })
+                    .then(() => console.log("success"))
+                    .catch(() => console.log("error"))
+                    ;
 
             }
 
@@ -85,7 +106,7 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
             <div className="flex flex-col items-center">
                 <CldUploadButton
                     options={{ maxFiles: 1 }}
-                    onUpload={(handleUpload)}
+                    onUpload={(result) => handleUpload(result)}
                     uploadPreset="cerid1mq"
                 >
                     <Avatar image={userData?.image || 'Logo2.svg'} edit />
@@ -99,8 +120,10 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
                 initialValues={initialValues}
                 onSubmit={(values, actions) => {
                     actions.setSubmitting(false);
-                    handleCreate(values);
-                    onSubmit();
+                    handleCreate(values)
+                        .then(() => onSubmit())
+                        .catch(() => console.log("error"))
+                        ;
 
                 }}
             >
