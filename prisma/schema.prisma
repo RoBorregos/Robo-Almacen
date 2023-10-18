@@ -8,6 +8,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Item {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now()) @updatedAt
+  name        String
+  description String
+  category    String
+  department  String
+  imgPath     String      @default("")
+  CeldaItem   CeldaItem[]
+}
+
+model Celda {
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  name      String
+  row       Int
+  column    Int
+  CeldaItem CeldaItem[]
+}
+
+model CeldaItem {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  quantity  Int
+  available Int
+  celdaId   String
+  itemId    String
+  Celda     Celda      @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+  Item      Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  Prestamo  Prestamo[]
+}
+
+model Prestamo {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  initialDate DateTime
+  finalDate   DateTime?
+  quantity    Int
+  celdaItemId String
+  userId      String
+  returned    Boolean   @default(false)
+  CeldaItem   CeldaItem @relation(fields: [celdaItemId], references: [id], onDelete: Cascade)
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Telemetry {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  value     String
+}
+
 model Example {
   id        String   @id @default(cuid())
   name      String
@@ -48,7 +105,7 @@ model User {
   email         String?    @unique
   emailVerified DateTime?
   image         String?
-  hasData      Boolean    @default(false)
+  hasData       Boolean    @default(false)
   accounts      Account[]
   Prestamo      Prestamo[]
   sessions      Session[]
@@ -63,69 +120,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Celda {
-  id        String      @id
-  createdAt DateTime    @default(now())
-  updatedAt DateTime
-  name      String
-  row       Int
-  column    Int
-  CeldaItem CeldaItem[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model CeldaItem {
-  id        String     @id
-  createdAt DateTime   @default(now())
-  updatedAt DateTime
-  quantity  Int
-  available Int
-  celdaId   String
-  itemId    String
-  Celda     Celda      @relation(fields: [celdaId], references: [id], onDelete: Cascade)
-  Item      Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  Prestamo  Prestamo[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Item {
-  id          String      @id
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
-  name        String
-  description String
-  category    String
-  department  String
-  imgPath     String      @default("")
-  CeldaItem   CeldaItem[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Prestamo {
-  id          String    @id
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime
-  initialDate DateTime
-  finalDate   DateTime?
-  quantity    Int
-  celdaItemId String
-  userId      String
-  returned    Boolean   @default(false)
-  CeldaItem   CeldaItem @relation(fields: [celdaItemId], references: [id], onDelete: Cascade)
-  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Telemetry {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  name      String
-  value     String
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model User2 {
   id       String @id
   name     String
@@ -137,12 +131,11 @@ model User2 {
 }
 
 model UserData {
-  id       String @id
+  id       String  @id
   major    String?
+  phone    String?
+  area     String?
+  image    String?
   semester Int?
-  phone   String?
-  area    String?
-  image   String?
-  
-  user    User   @relation(fields: [id], references: [id], onDelete: Cascade)
+  user     User    @relation(fields: [id], references: [id], onDelete: Cascade)
 }

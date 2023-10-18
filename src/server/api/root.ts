@@ -1,5 +1,7 @@
 import { createTRPCRouter } from "rbgs/server/api/trpc";
 import { exampleRouter } from "rbgs/server/api/routers/example";
+import { celdaRouter } from "rbgs/server/api/routers/celdaApi";
+import { itemRouter } from "rbgs/server/api/routers/itemApi";
 import { userDataRouter } from "./routers/userData";
 
 /**
@@ -9,6 +11,8 @@ import { userDataRouter } from "./routers/userData";
  */
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
+  celda: celdaRouter,
+  item: itemRouter,
   userData: userDataRouter,
 });
 
