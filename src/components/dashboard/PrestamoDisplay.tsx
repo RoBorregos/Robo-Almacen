@@ -25,7 +25,7 @@ const PrestamoDisplay = ({
   const [searchInput, setSearchInput] = useState("");
   const [visible, setVisible] = useState(true);
 
-  const { data: prestamos, isLoading } = api.general.getPrestamosId.useQuery({
+  const { data: prestamos, isLoading } = api.prestamos.getPrestamosId.useQuery({
     search: searchInput,
     type: type,
   });

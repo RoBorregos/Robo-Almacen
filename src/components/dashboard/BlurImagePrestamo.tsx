@@ -16,7 +16,7 @@ const BlurImagePrestamo = ({
   idPrestamo: string;
   type?: string;
 }) => {
-  const { data: prestamo } = api.general.getPrestamoDetailsById.useQuery({
+  const { data: prestamo } = api.prestamos.getPrestamoDetailsById.useQuery({
     id: idPrestamo,
   });
   const item: Item | undefined = prestamo?.CeldaItem.Item;

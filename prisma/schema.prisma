@@ -48,9 +48,11 @@ model User {
   email         String?    @unique
   emailVerified DateTime?
   image         String?
+  hasData       Boolean    @default(false)
   accounts      Account[]
   Prestamo      Prestamo[]
   sessions      Session[]
+  UserData      UserData?
 }
 
 model VerificationToken {
@@ -74,7 +76,7 @@ model Celda {
 model CeldaItem {
   id        String     @id @default(cuid())
   createdAt DateTime   @default(now())
-  updatedAt DateTime
+  updatedAt DateTime   @updatedAt
   quantity  Int
   available Int
   celdaId   String
@@ -103,9 +105,9 @@ model Prestamo {
   initialDate DateTime
   finalDate   DateTime?
   quantity    Int
-  returned    Boolean   @default(false)
   celdaItemId String
   userId      String
+  returned    Boolean   @default(false)
   CeldaItem   CeldaItem @relation(fields: [celdaItemId], references: [id], onDelete: Cascade)
   User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -126,4 +128,15 @@ model User2 {
   semester String
   phone    String
   area     String
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model UserData {
+  id       String  @id
+  major    String?
+  phone    String?
+  area     String?
+  image    String?
+  semester Int?
+  User     User    @relation(fields: [id], references: [id], onDelete: Cascade)
 }

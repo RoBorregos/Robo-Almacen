@@ -16,7 +16,7 @@ const BlurImageItem = ({
   itemId: string;
   type?: string;
 }) => {
-  const { data: item } = api.general.getItemById.useQuery({
+  const { data: item } = api.items.getItemById.useQuery({
     id: itemId,
   });
 

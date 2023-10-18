@@ -28,7 +28,7 @@ const ItemDisplay = ({ style }: { style: ItemDisplayStyle }) => {
   const [searchInput, setSearchInput] = useState("");
   const [visible, setVisible] = useState(true);
 
-  const { data: items, isLoading } = api.general.getItemsId.useQuery({
+  const { data: items, isLoading } = api.items.getItemsId.useQuery({
     search: searchInput,
   });
 

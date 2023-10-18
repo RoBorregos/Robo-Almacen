@@ -1,7 +1,8 @@
 import { createTRPCRouter } from "rbgs/server/api/trpc";
 import { exampleRouter } from "rbgs/server/api/routers/example";
-import { generalRouter } from "./routers/general";
+import { itemsRouter } from "./routers/items";
 import { testsRouter } from "./routers/tests";
+import { prestamosRouter } from "./routers/prestamos";
 
 /**
  * This is the primary router for your server.
@@ -10,8 +11,9 @@ import { testsRouter } from "./routers/tests";
  */
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
-  general: generalRouter,
+  items: itemsRouter,
   tests: testsRouter,
+  prestamos: prestamosRouter,
 });
 
 // export type definition of API

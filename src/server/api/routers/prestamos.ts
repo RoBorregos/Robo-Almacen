@@ -6,107 +6,8 @@ import {
   protectedProcedure,
 } from "rbgs/server/api/trpc";
 
-export const generalRouter = createTRPCRouter({
-  getAllItems: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.item.findMany({
-      orderBy: {
-        name: "asc",
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-  }),
-
-  getItemsId: publicProcedure
-    .input(z.object({ search: z.string() }))
-    .query(({ input, ctx }) => {
-      if (input.search === "") {
-        return ctx.prisma.item.findMany({
-          select: {
-            id: true,
-          },
-        });
-      }
-
-      return ctx.prisma.item.findMany({
-        where: {
-          OR: [
-            {
-              name: {
-                contains: input.search,
-              },
-            },
-            {
-              description: {
-                contains: input.search,
-              },
-            },
-            {
-              category: {
-                contains: input.search,
-              },
-            },
-            {
-              department: {
-                contains: input.search,
-              },
-            },
-          ],
-        },
-        select: {
-          id: true,
-        },
-      });
-    }),
-
-  getItemById: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(({ input, ctx }) => {
-      return ctx.prisma.item.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-    }),
-
-  getItemsSearch: publicProcedure
-    .input(z.object({ search: z.string() }))
-    .query(({ input, ctx }) => {
-      if (input.search === "") {
-        return ctx.prisma.item.findMany({});
-      }
-
-      return ctx.prisma.item.findMany({
-        where: {
-          OR: [
-            {
-              name: {
-                contains: input.search,
-              },
-            },
-            {
-              description: {
-                contains: input.search,
-              },
-            },
-            {
-              category: {
-                contains: input.search,
-              },
-            },
-            {
-              department: {
-                contains: input.search,
-              },
-            },
-          ],
-        },
-      });
-    }),
-
-  getPrestamosId: publicProcedure
+export const prestamosRouter = createTRPCRouter({
+  getPrestamosId: protectedProcedure
     .input(z.object({ search: z.string(), type: z.string() }))
     .query(({ input, ctx }) => {
       return ctx.prisma.prestamo.findMany({
@@ -163,7 +64,7 @@ export const generalRouter = createTRPCRouter({
       });
     }),
 
-  getPrestamoDetailsById: publicProcedure
+  getPrestamoDetailsById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(({ input, ctx }) => {
       return ctx.prisma.prestamo.findUnique({
@@ -180,7 +81,7 @@ export const generalRouter = createTRPCRouter({
       });
     }),
 
-  getPrestamosSearch: publicProcedure
+  getPrestamosSearch: protectedProcedure
     .input(z.object({ search: z.string(), type: z.string() }))
     .query(({ input, ctx }) => {
       return ctx.prisma.prestamo.findMany({
@@ -241,7 +142,7 @@ export const generalRouter = createTRPCRouter({
       });
     }),
 
-  getPrestamosByItem: publicProcedure
+  getPrestamosByItem: protectedProcedure
     .input(
       z.object({
         id: z.string().nullable(),
@@ -281,72 +182,157 @@ export const generalRouter = createTRPCRouter({
       });
     }),
 
-  getItemCounts: publicProcedure
-    .input(z.object({ id: z.string() }))
+  // Choose cells that have more items of the requested one.
+  createPrestamo: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        quantity: z.number(),
+      })
+    )
     .query(async ({ input, ctx }) => {
-      const allRelatedItems = await ctx.prisma.celdaItem.findMany({
-        where: {
-          itemId: input.id,
-        },
-        select: {
-          quantity: true,
-        },
-      });
-
-      let totalCount = 0;
-
-      allRelatedItems?.forEach((item) => {
-        totalCount += item.quantity;
-      });
-
-      const availableItems = await ctx.prisma.celdaItem.findMany({
+      const celdaItem = await ctx.prisma.celdaItem.findMany({
         where: {
           AND: [
             {
-              itemId: input.id,
+              Item: {
+                id: input.id,
+              },
             },
             {
-              Prestamo: {
-                none: {},
+              quantity: {
+                gte: 0,
               },
             },
           ],
         },
+        orderBy: {
+          quantity: "asc",
+        },
       });
 
+      if (celdaItem.length === 0 && celdaItem != undefined) {
+        return "No hay items disponibles del seleccionado.";
+      }
+
+      // Check if there are enough items available.
       let availableCount = 0;
 
-      availableItems?.forEach((item) => {
+      celdaItem.map((item) => {
         availableCount += item.quantity;
       });
 
-      const prestados = totalCount - availableCount;
+      if (availableCount < input.quantity) {
+        return "La cantidad de items solicitados no está disponible.";
+      }
 
-      const itemsPrestados = await ctx.prisma.celdaItem.findMany({
-        where: {
-          AND: [
-            {
-              itemId: input.id,
-            },
-            {
-              Prestamo: {
-                some: {},
+      let remainingQuantity = input.quantity;
+      const openCells: string[] = [];
+
+      // Update the quantity of the items in the cells.
+      // Use transaction to ensure that all the updates are done or failed.
+      await ctx.prisma.$transaction(async (tx) => {
+        for (let i = 0; i < celdaItem.length && remainingQuantity > 0; i++) {
+          const item = celdaItem[i];
+          if (!item) continue;
+          openCells.push(item.celdaId);
+          if (item.quantity >= remainingQuantity) {
+            await tx.celdaItem.update({
+              where: {
+                id: item.id,
               },
-            },
-          ],
+              data: {
+                quantity: item.quantity - remainingQuantity,
+              },
+            });
+
+            remainingQuantity = 0;
+          } else {
+            await tx.celdaItem.update({
+              where: {
+                id: item.id,
+              },
+              data: {
+                quantity: 0,
+              },
+            });
+
+            remainingQuantity -= item.quantity;
+          }
+        }
+        // Open cells stored in openCells.
+        // open(openCells);
+      });
+
+      return "Prestamo creado exitosamente.";
+    }),
+  returnPrestamo: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const prestamo = await ctx.prisma.prestamo.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          CeldaItem: true,
         },
       });
 
-      let prestadosCount = 0;
+      if (!prestamo) {
+        return "No se encontró el prestamo.";
+      }
 
-      itemsPrestados?.forEach((item) => {
-        prestadosCount += item.quantity;
+      // Check cells that have the item. Return the item to the cell that has the most of the same item
+      // and that has space to store the item.
+
+      const celdaItem = await ctx.prisma.celdaItem.findFirst({
+        where: {
+          Item: {
+            id: prestamo.CeldaItem.itemId,
+          },
+        },
+        orderBy: {
+          quantity: "desc",
+        },
       });
 
-      return {
-        totalCount,
-        availableCount,
-        prestadosCount,
-      };
+      // Select a random cell.
+      let returnCell = await ctx.prisma.celdaItem.findFirst({});
+
+      if (celdaItem) {
+        // Store the items in the cell that has the most of the returned item.
+        await ctx.prisma.celdaItem.update({
+          where: {
+            id: celdaItem.id,
+          },
+          data: {
+            quantity: celdaItem.quantity + prestamo.quantity,
+          },
+        });
+        // Open cell
+        // open(celdaItem.celdaId);
+      } else if (!celdaItem && returnCell) {
+        // Store the items in the first available cell.
+        await ctx.prisma.celdaItem.update({
+          where: {
+            id: returnCell?.id,
+          },
+          data: {
+            quantity: returnCell?.quantity + prestamo.quantity,
+          },
+        });
+        // Open cell
+        // open(celdaItem.celdaId);
+      } else if (!celdaItem && !returnCell) {
+        return "Error: no hay ninguna celda disponible para regresar el pedido.";
+      } else {
+        return "Error: un error inesperado ocurrió.";
+      }
+
+      return "La celda fue abierta y el prestamo fue devuelto exitosamente.";
     }),
 });

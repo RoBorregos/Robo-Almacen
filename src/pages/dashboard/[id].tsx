@@ -8,7 +8,6 @@ import { api } from "rbgs/utils/api";
 import { useState } from "react";
 
 const ViewPrestamo: NextPage = () => {
-  const utils = api.useContext();
   const router = useRouter();
 
   const [includeReturned, setIncludeReturned] = useState(false);
@@ -16,16 +15,16 @@ const ViewPrestamo: NextPage = () => {
   const { id } = router.query;
 
   const { data: item, isLoading: isLoadingItem } =
-    api.general.getItemById.useQuery({ id: id as string });
+    api.items.getItemById.useQuery({ id: id as string });
 
   const { data: prestamos, isLoading: isLoadingPrestamo } =
-    api.general.getPrestamosByItem.useQuery({
+    api.prestamos.getPrestamosByItem.useQuery({
       id: id as string,
       includeReturned: includeReturned,
     });
 
   const { data: itemsDropDown, isLoading: isLoadingItemsD } =
-    api.general.getAllItems.useQuery();
+    api.items.getAllItems.useQuery();
 
   if (isLoadingItem) {
     return (

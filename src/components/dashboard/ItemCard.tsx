@@ -2,7 +2,7 @@ import { Item } from "@prisma/client";
 import { api } from "rbgs/utils/api";
 
 const ItemCard = ({ item }: { item: Item | null | undefined }) => {
-  const { data: itemsCounts } = api.general.getItemCounts.useQuery({
+  const { data: itemsCounts } = api.items.getItemCounts.useQuery({
     id: item?.id as string,
   });
 
