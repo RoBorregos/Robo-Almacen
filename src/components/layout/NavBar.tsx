@@ -8,7 +8,7 @@ const NavBar = ({
   routes: { name: string; path: string }[];
 }) => {
   return (
-    <div className="w-full bg-sky-100 h-16 flex fixed">
+    <div className="w-full bg-sky-100 h-16 flex">
       <div className="flex-1 flex items-center justify-center">
         <div className="flex mb-0">
           <ul className="flex items-center">
