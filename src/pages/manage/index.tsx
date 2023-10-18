@@ -166,7 +166,7 @@ const Grid: NextPage = () => {
                 {cell.id !== "" ? (
                   <div>
                     <button
-                      className="rounded-full bg-blue-400 px-2 py-1 font-bold text-white hover:bg-blue-700 transition ease-in-out delay-10 hover:scale-150 duration-300"
+                      className="rounded-3xl bg-blue-400 px-2 py-1 font-bold text-white hover:bg-blue-700 transition ease-in-out delay-10 hover:scale-125 duration-300"
                       // popovertarget={cell.id}
                       onClick={() => {
                         console.log("cell", cell);
@@ -198,9 +198,9 @@ const Grid: NextPage = () => {
                         }
                         id={cell.id}
                       >
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 text-sm">
                           <button
-                            className="rounded-full bg-yellow-400 px-5 py-3 font-bold text-white hover:bg-yellow-600"
+                            className="rounded-2xl bg-yellow-400 px-3 py-2 font-bold text-white hover:bg-yellow-600"
                             onClick={() => {
                               console.log("cell", cell);
                               void router.push(`/manage/${cell.id}`);
@@ -209,7 +209,7 @@ const Grid: NextPage = () => {
                             {"Actualizar " + cell.name}
                           </button>
                           <button
-                            className="rounded-full bg-red-400 px-5 py-3 font-bold text-white hover:bg-red-700"
+                            className="rounded-2xl bg-red-400 px-3 py-2 font-bold text-white hover:bg-red-700"
                             onClick={() => {
                               void handleDeleteCelda(cell);
                               const dialog = document.getElementById(
@@ -223,7 +223,7 @@ const Grid: NextPage = () => {
                             Borrar Celda
                           </button>
                           <button
-                            className="rounded-full bg-blue-400 px-5 py-3 font-bold text-white hover:bg-blue-700"
+                            className="rounded-2xl bg-blue-400 px-3 py-2 font-bold text-white hover:bg-blue-700"
                             onClick={() => {
                               setSelectedCell(cell);
                               const dialog = document.getElementById(
@@ -238,7 +238,7 @@ const Grid: NextPage = () => {
                           </button>
 
                           <button
-                            className="rounded-full bg-green-400 px-5 py-3 font-bold text-white hover:bg-green-700"
+                            className="rounded-2xl bg-green-400 px-3 py-2 font-bold text-white hover:bg-green-700"
                             onClick={() => {
                               const dialog = document.getElementById(
                                 cell.id
