@@ -74,16 +74,14 @@ model Celda {
 }
 
 model CeldaItem {
-  id        String     @id @default(cuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   quantity  Int
-  available Int
   celdaId   String
   itemId    String
-  Celda     Celda      @relation(fields: [celdaId], references: [id], onDelete: Cascade)
-  Item      Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  Prestamo  Prestamo[]
+  Celda     Celda    @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+  Item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }
 
 model Item {
@@ -96,19 +94,21 @@ model Item {
   department  String
   imgPath     String      @default("")
   CeldaItem   CeldaItem[]
+  Prestamo    Prestamo[]
 }
 
 model Prestamo {
-  id          String    @id
+  id          String    @id @default(cuid())
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime
-  initialDate DateTime
+  updatedAt   DateTime  @updatedAt
+  initialDate DateTime  @default(now())
   finalDate   DateTime?
   quantity    Int
-  celdaItemId String
   userId      String
   returned    Boolean   @default(false)
-  CeldaItem   CeldaItem @relation(fields: [celdaItemId], references: [id], onDelete: Cascade)
+  itemId      String
+  description String    @default("")
+  Item        Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
   User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

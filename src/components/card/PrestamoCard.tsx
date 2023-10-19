@@ -16,10 +16,20 @@ export const PrestamoCard = ({
   id: string;
   showUser: boolean;
 }) => {
+  const context = api.useContext();
   const { data: prestamo, isLoading } =
     api.prestamos.getPrestamoDetailsById.useQuery({
       id: id,
     });
+
+  const returnPrestamo = api.prestamos.returnPrestamo.useMutation({
+    onSuccess: (message) => {
+      alert(message);
+      if (message) {
+        void context.prestamos.invalidate();
+      }
+    },
+  });
 
   if (isLoading) {
     return (
@@ -31,13 +41,16 @@ export const PrestamoCard = ({
     );
   } else if (prestamo) {
     return (
-      <GeneralCard
-        title={prestamo.CeldaItem.Item.name}
-        imageLink={prestamo.CeldaItem.Item.imgPath}
-      >
+      <GeneralCard title={prestamo.Item.name} imageLink={prestamo.Item.imgPath}>
         <div className="flex flex-col">
-          <div className="flex h-20 w-full flex-col justify-around align-middle">
+          <div className="align-middl mb-6 mt-2 flex h-20 w-full flex-col justify-around text-black">
             <h3>Detalles del préstamo</h3>
+            <p>
+              Descripción:{" "}
+              {prestamo.description === ""
+                ? "No hay descripción"
+                : prestamo.description}
+            </p>
             <p>Fecha de préstamo: {prestamo.initialDate.toDateString()}</p>
             <p>Cantidad: {prestamo.quantity}</p>
             {showUser && <p>Usuario: {prestamo.User.name}</p>}
@@ -45,9 +58,14 @@ export const PrestamoCard = ({
               <p>Fecha de regreso: {prestamo.finalDate?.toDateString()}</p>
             )}
           </div>
-          <button className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black">
-            Devolver préstamo
-          </button>
+          {!prestamo.returned && (
+            <button
+              onClick={() => returnPrestamo.mutate({ id: id })}
+              className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
+            >
+              Devolver préstamo
+            </button>
+          )}
         </div>
       </GeneralCard>
     );

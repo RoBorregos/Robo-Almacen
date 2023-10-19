@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 import {
   createTRPCRouter,
@@ -17,6 +18,9 @@ export const prestamosRouter = createTRPCRouter({
               returned: input.type === "activo" ? false : true,
             },
             {
+              userId: ctx.session.user.id,
+            },
+            {
               OR: [
                 {
                   id: {
@@ -24,31 +28,29 @@ export const prestamosRouter = createTRPCRouter({
                   },
                 },
                 {
-                  CeldaItem: {
-                    Item: {
-                      OR: [
-                        {
-                          name: {
-                            contains: input.search,
-                          },
+                  Item: {
+                    OR: [
+                      {
+                        name: {
+                          contains: input.search,
                         },
-                        {
-                          description: {
-                            contains: input.search,
-                          },
+                      },
+                      {
+                        description: {
+                          contains: input.search,
                         },
-                        {
-                          category: {
-                            contains: input.search,
-                          },
+                      },
+                      {
+                        category: {
+                          contains: input.search,
                         },
-                        {
-                          department: {
-                            contains: input.search,
-                          },
+                      },
+                      {
+                        department: {
+                          contains: input.search,
                         },
-                      ],
-                    },
+                      },
+                    ],
                   },
                 },
               ],
@@ -72,11 +74,7 @@ export const prestamosRouter = createTRPCRouter({
           id: input.id,
         },
         include: {
-          CeldaItem: {
-            select: {
-              Item: true,
-            },
-          },
+          Item: true,
           User: {
             select: {
               name: true,
@@ -103,31 +101,29 @@ export const prestamosRouter = createTRPCRouter({
                   },
                 },
                 {
-                  CeldaItem: {
-                    Item: {
-                      OR: [
-                        {
-                          name: {
-                            contains: input.search,
-                          },
+                  Item: {
+                    OR: [
+                      {
+                        name: {
+                          contains: input.search,
                         },
-                        {
-                          description: {
-                            contains: input.search,
-                          },
+                      },
+                      {
+                        description: {
+                          contains: input.search,
                         },
-                        {
-                          category: {
-                            contains: input.search,
-                          },
+                      },
+                      {
+                        category: {
+                          contains: input.search,
                         },
-                        {
-                          department: {
-                            contains: input.search,
-                          },
+                      },
+                      {
+                        department: {
+                          contains: input.search,
                         },
-                      ],
-                    },
+                      },
+                    ],
                   },
                 },
               ],
@@ -135,11 +131,7 @@ export const prestamosRouter = createTRPCRouter({
           ],
         },
         include: {
-          CeldaItem: {
-            select: {
-              Item: true,
-            },
-          },
+          Item: true,
         },
         orderBy: {
           finalDate: input.type === "activo" ? "asc" : "desc",
@@ -163,10 +155,8 @@ export const prestamosRouter = createTRPCRouter({
         where: {
           AND: [
             {
-              CeldaItem: {
-                Item: {
-                  id: input.id,
-                },
+              Item: {
+                id: input.id,
               },
             },
 
@@ -193,9 +183,10 @@ export const prestamosRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         quantity: z.number(),
+        description: z.string(),
       })
     )
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       const celdaItem = await ctx.prisma.celdaItem.findMany({
         where: {
           AND: [
@@ -216,8 +207,17 @@ export const prestamosRouter = createTRPCRouter({
         },
       });
 
+      if (input.quantity < 1) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "La cantidad debe ser mayor a 0.",
+        });
+      }
       if (celdaItem.length === 0 && celdaItem != undefined) {
-        return "No hay items disponibles del seleccionado.";
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "No hay items disponibles.",
+        });
       }
 
       // Check if there are enough items available.
@@ -228,7 +228,10 @@ export const prestamosRouter = createTRPCRouter({
       });
 
       if (availableCount < input.quantity) {
-        return "La cantidad de items solicitados no está disponible.";
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "No hay suficientes items disponibles.",
+        });
       }
 
       let remainingQuantity = input.quantity;
@@ -265,11 +268,20 @@ export const prestamosRouter = createTRPCRouter({
             remainingQuantity -= item.quantity;
           }
         }
+
+        await tx.prestamo.create({
+          data: {
+            itemId: input.id,
+            description: input.description,
+            quantity: input.quantity,
+            userId: ctx.session.user.id,
+          },
+        });
         // Open cells stored in openCells.
         // open(openCells);
       });
 
-      return "Prestamo creado exitosamente.";
+      return "Préstamo creado exitosamente.";
     }),
   returnPrestamo: protectedProcedure
     .input(
@@ -277,18 +289,22 @@ export const prestamosRouter = createTRPCRouter({
         id: z.string(),
       })
     )
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       const prestamo = await ctx.prisma.prestamo.findUnique({
         where: {
           id: input.id,
         },
         include: {
-          CeldaItem: true,
+          Item: true,
         },
       });
 
       if (!prestamo) {
         return "No se encontró el prestamo.";
+      }
+
+      if (prestamo.returned) {
+        return "Error: el préstamo ya fue devuelto.";
       }
 
       // Check cells that have the item. Return the item to the cell that has the most of the same item
@@ -297,7 +313,7 @@ export const prestamosRouter = createTRPCRouter({
       const celdaItem = await ctx.prisma.celdaItem.findFirst({
         where: {
           Item: {
-            id: prestamo.CeldaItem.itemId,
+            id: prestamo.Item.id,
           },
         },
         orderBy: {
@@ -310,32 +326,60 @@ export const prestamosRouter = createTRPCRouter({
 
       if (celdaItem) {
         // Store the items in the cell that has the most of the returned item.
-        await ctx.prisma.celdaItem.update({
-          where: {
-            id: celdaItem.id,
-          },
-          data: {
-            quantity: celdaItem.quantity + prestamo.quantity,
-          },
+        await ctx.prisma.$transaction(async (tx) => {
+          await tx.celdaItem.update({
+            where: {
+              id: celdaItem.id,
+            },
+            data: {
+              quantity: celdaItem.quantity + prestamo.quantity,
+            },
+          });
+          await ctx.prisma.prestamo.update({
+            where: {
+              id: prestamo.id,
+            },
+            data: {
+              returned: true,
+            },
+          });
         });
+
         // Open cell
         // open(celdaItem.celdaId);
       } else if (!celdaItem && returnCell) {
         // Store the items in the first available cell.
-        await ctx.prisma.celdaItem.update({
-          where: {
-            id: returnCell?.id,
-          },
-          data: {
-            quantity: returnCell?.quantity + prestamo.quantity,
-          },
+
+        await ctx.prisma.$transaction(async (tx) => {
+          await tx.celdaItem.update({
+            where: {
+              id: returnCell?.id,
+            },
+            data: {
+              quantity: (returnCell?.quantity ?? 0) + prestamo.quantity,
+            },
+          });
+          tx.prestamo.update({
+            where: {
+              id: input.id,
+            },
+            data: {
+              returned: true,
+            },
+          });
         });
         // Open cell
         // open(celdaItem.celdaId);
       } else if (!celdaItem && !returnCell) {
-        return "Error: no hay ninguna celda disponible para regresar el pedido.";
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "No hay ninguna celda disponible para regresar el pedido.",
+        });
       } else {
-        return "Error: un error inesperado ocurrió.";
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error inesperado.",
+        });
       }
 
       return "La celda fue abierta y el prestamo fue devuelto exitosamente.";

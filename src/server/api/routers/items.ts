@@ -7,7 +7,7 @@ import {
 } from "rbgs/server/api/trpc";
 
 export const itemsRouter = createTRPCRouter({
-  getAllItems: publicProcedure.query(({ ctx }) => {
+  getAllItems: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.item.findMany({
       orderBy: {
         name: "asc",
@@ -19,16 +19,9 @@ export const itemsRouter = createTRPCRouter({
     });
   }),
 
-  getItemsId: publicProcedure
+  getItemsId: protectedProcedure
     .input(z.object({ search: z.string() }))
     .query(({ input, ctx }) => {
-      if (input.search === "") {
-        return ctx.prisma.item.findMany({
-          select: {
-            id: true,
-          },
-        });
-      }
 
       return ctx.prisma.item.findMany({
         where: {
@@ -61,7 +54,7 @@ export const itemsRouter = createTRPCRouter({
       });
     }),
 
-  getItemById: publicProcedure
+  getItemById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(({ input, ctx }) => {
       return ctx.prisma.item.findUnique({
@@ -71,13 +64,10 @@ export const itemsRouter = createTRPCRouter({
       });
     }),
 
-  getItemsSearch: publicProcedure
+  getItemsSearch: protectedProcedure
     .input(z.object({ search: z.string() }))
     .query(({ input, ctx }) => {
-      if (input.search === "") {
-        return ctx.prisma.item.findMany({});
-      }
-
+  
       return ctx.prisma.item.findMany({
         where: {
           OR: [
@@ -105,7 +95,7 @@ export const itemsRouter = createTRPCRouter({
         },
       });
     }),
-  getItemCounts: publicProcedure
+  getItemCounts: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       const allRelatedItems = await ctx.prisma.celdaItem.findMany({
@@ -129,11 +119,6 @@ export const itemsRouter = createTRPCRouter({
             {
               itemId: input.id,
             },
-            {
-              Prestamo: {
-                none: {},
-              },
-            },
           ],
         },
       });
@@ -151,11 +136,6 @@ export const itemsRouter = createTRPCRouter({
           AND: [
             {
               itemId: input.id,
-            },
-            {
-              Prestamo: {
-                some: {},
-              },
             },
           ],
         },

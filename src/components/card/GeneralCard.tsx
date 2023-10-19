@@ -1,15 +1,18 @@
 import { env } from "../../env.mjs";
 import { useState, useEffect } from "react";
 import { isImgUrl } from "../../utils/image";
+import { twMerge } from "tailwind-merge";
 
 export const GeneralCard = ({
   children,
   title = "Card",
   imageLink,
+  className,
 }: {
   children: React.ReactNode;
   title?: string;
   imageLink?: string;
+  className?: string;
 }) => {
   // Add image validation
   const [imageUrl, setimageUrl] = useState(env.NEXT_PUBLIC_DEFAULT_IMAGE);
@@ -29,7 +32,12 @@ export const GeneralCard = ({
   }, [imageLink]);
 
   return (
-    <div className="max-w-sm rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
+    <div
+      className={twMerge(
+        "max-w-sm rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800",
+        className
+      )}
+    >
       <a href="#">
         <img className="rounded-t-lg" src={imageUrl} alt="" />
       </a>
