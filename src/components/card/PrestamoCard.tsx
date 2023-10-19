@@ -1,6 +1,5 @@
 import { GeneralCard } from "./GeneralCard";
 import { api } from "../../utils/api";
-import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import { useState } from "react";
 
 // Prestamo card must contain:

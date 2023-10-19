@@ -27,11 +27,7 @@
     "next-cloudinary": "^4.21.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-<<<<<<< HEAD
-    "react-icons": "^4.9.0",
-=======
     "react-icons": "^4.11.0",
->>>>>>> main
     "superjson": "1.12.2",
     "tailwind-merge": "^1.14.0",
     "zod": "^3.21.4"

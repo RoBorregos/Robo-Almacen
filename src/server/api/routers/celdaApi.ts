@@ -22,8 +22,6 @@ export const celdaRouter = createTRPCRouter({
         },
       });
     }),
-
-  // create: protectedProcedure
   create: publicProcedure
     .input(
       z.object({
@@ -88,7 +86,6 @@ export const celdaRouter = createTRPCRouter({
           celdaId: input.id,
           itemId: input.itemId,
           quantity: input.quantity,
-          available: input.quantity,
         },
       });
     }),

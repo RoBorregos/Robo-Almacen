@@ -6,66 +6,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-<<<<<<< HEAD
-=======
-}
-
-model Item {
-  id          String      @id @default(cuid())
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now()) @updatedAt
-  name        String
-  description String
-  category    String
-  department  String
-  imgPath     String      @default("")
-  CeldaItem   CeldaItem[]
-}
-
-model Celda {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  name      String
-  row       Int
-  column    Int
-  CeldaItem CeldaItem[]
-}
-
-model CeldaItem {
-  id        String     @id @default(cuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  quantity  Int
-  available Int
-  celdaId   String
-  itemId    String
-  Celda     Celda      @relation(fields: [celdaId], references: [id], onDelete: Cascade)
-  Item      Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  Prestamo  Prestamo[]
-}
-
-model Prestamo {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  initialDate DateTime
-  finalDate   DateTime?
-  quantity    Int
-  celdaItemId String
-  userId      String
-  returned    Boolean   @default(false)
-  CeldaItem   CeldaItem @relation(fields: [celdaItemId], references: [id], onDelete: Cascade)
-  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Telemetry {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String
-  value     String
->>>>>>> main
 }
 
 model Example {
@@ -123,11 +63,10 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-<<<<<<< HEAD
 model Celda {
-  id        String      @id
+  id        String      @id @default(cuid())
   createdAt DateTime    @default(now())
-  updatedAt DateTime
+  updatedAt DateTime    @updatedAt
   name      String
   row       Int
   column    Int
@@ -181,8 +120,6 @@ model Telemetry {
   value     String
 }
 
-=======
->>>>>>> main
 model User2 {
   id       String @id
   name     String
@@ -193,10 +130,7 @@ model User2 {
   area     String
 }
 
-<<<<<<< HEAD
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-=======
->>>>>>> main
 model UserData {
   id       String  @id
   major    String?
@@ -204,9 +138,5 @@ model UserData {
   area     String?
   image    String?
   semester Int?
-<<<<<<< HEAD
   User     User    @relation(fields: [id], references: [id], onDelete: Cascade)
-=======
-  user     User    @relation(fields: [id], references: [id], onDelete: Cascade)
->>>>>>> main
 }
