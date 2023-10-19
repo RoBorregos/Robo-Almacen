@@ -2,6 +2,7 @@ import { api } from "rbgs/utils/api";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import React, { useState } from "react";
 import BlurImageItem from "./BlurImageItem";
+import { twMerge } from "tailwind-merge";
 
 // Interace to personalize display of component
 interface ItemDisplayStyle {
@@ -62,15 +63,23 @@ const ItemDisplay = ({ style }: { style: ItemDisplayStyle }) => {
 
       {!isLoading && visible && (
         <div
-          className={`${
-            displayType[style.type]
-          } flex flex-wrap items-center justify-between rounded-md border-8 ${
+          className={twMerge(
+            "flex flex-wrap items-center justify-between rounded-md border-8",
+            displayType[style.type],
             colorVariants[style.color]
-          } `}
+          )}
         >
-          {items?.map((item, id) => (
-            <BlurImageItem itemId={item.id} type={style?.type} key={item.id} />
-          ))}
+          {items && items.length > 0 ? (
+            items?.map((item, id) => (
+              <BlurImageItem
+                itemId={item.id}
+                type={style?.type}
+                key={item.id}
+              />
+            ))
+          ) : (
+            <p>No hay items por mostrar.</p>
+          )}
         </div>
       )}
     </div>

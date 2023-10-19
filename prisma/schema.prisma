@@ -89,7 +89,7 @@ model CeldaItem {
 model Item {
   id          String      @id @default(cuid())
   createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   name        String
   description String
   category    String

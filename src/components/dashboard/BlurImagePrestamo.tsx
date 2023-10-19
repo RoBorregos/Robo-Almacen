@@ -3,6 +3,9 @@ import { useRouter } from "next/router";
 import { Item } from "@prisma/client";
 import GenButton from "../buttons/GenericButton";
 import { api } from "rbgs/utils/api";
+import { useState } from "react";
+import { env } from "../../env.mjs";
+import { twMerge } from "tailwind-merge";
 
 const displayType: { [key: string]: string } = {
   row: "h-1/3 w-1/3",
@@ -16,6 +19,7 @@ const BlurImagePrestamo = ({
   idPrestamo: string;
   type?: string;
 }) => {
+  // const [imageUrl, setimageUrl] = useState(env.NEXT_PUBLIC_DEFAULT_IMAGE);
   const { data: prestamo } = api.prestamos.getPrestamoDetailsById.useQuery({
     id: idPrestamo,
   });
@@ -25,7 +29,7 @@ const BlurImagePrestamo = ({
 
   return (
     <div
-      className={`group/item relative ${displayType[type]}`}
+      className={twMerge("group/item relative", displayType[type])}
       key={prestamo?.id}
     >
       <img
@@ -50,7 +54,9 @@ const BlurImagePrestamo = ({
           title="Ver préstamos de material"
           size="large"
           className="absolute bottom-2 right-1/2 translate-x-1/2 opacity-0 duration-300 group-hover/item:opacity-100"
-          onclick={() => {router.push(`/dashboard/${item?.id}`)}}
+          onclick={() => {
+            router.push(`/dashboard/${item?.id}`);
+          }}
         />
       ) : (
         <GenButton

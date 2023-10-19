@@ -77,6 +77,11 @@ export const prestamosRouter = createTRPCRouter({
               Item: true,
             },
           },
+          User: {
+            select: {
+              name: true,
+            },
+          },
         },
       });
     }),

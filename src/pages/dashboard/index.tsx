@@ -1,6 +1,8 @@
 import { type NextPage } from "next";
 import Layout from "rbgs/components/layout/Layout";
 import { api } from "rbgs/utils/api";
+import { GeneralCard } from "../../components/card/GeneralCard";
+import { ItemCard } from "../../components/card/ItemCard";
 import ItemDisplay, {
   ItemDisplayStyle,
 } from "rbgs/components/dashboard/ItemDisplay";
@@ -41,17 +43,20 @@ const historial: ItemDisplayStyle = {
 const Dashboard: NextPage = () => {
   const { status } = useSession();
 
-  if (status === "unauthenticated"){
+  if (status === "unauthenticated") {
     return (
       <Layout>
-        <h1 className="text-4xl font-bold text-white">Inicia sesión para acceder a esta página</h1>
+        <h1 className="text-4xl font-bold text-white">
+          Inicia sesión para acceder a esta página
+        </h1>
       </Layout>
-    )
+    );
   }
 
   return (
     <Layout>
-      <div className="flex w-full flex-col items-center justify-center gap-4">
+      <ItemCard id="clnw52yld0014z2oaae4t3qwy"/>
+      {/* <div className="flex w-full flex-col items-center justify-center gap-4">
         <h1 className="text-4xl font-bold text-white">Dashboard Principal</h1>
         <div className="flex basis-8/12 flex-row flex-wrap justify-around">
           <div className="basis-8/12 flex-col">
@@ -66,7 +71,7 @@ const Dashboard: NextPage = () => {
             <PrestamoDisplay type="inactivo" style={historial} />
           </div>
         </div>
-      </div>
+      </div> */}
     </Layout>
   );
 };

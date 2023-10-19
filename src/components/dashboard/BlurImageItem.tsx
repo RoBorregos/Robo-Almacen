@@ -1,8 +1,10 @@
 import * as React from "react";
-import { useRouter } from "next/router";
 import GenButton from "../buttons/GenericButton";
 import { api } from "rbgs/utils/api";
-import { generateRandomItem } from "rbgs/utils/generateData";
+import { isImgUrl } from "../../utils/image";
+import { useEffect, useState } from "react";
+import { env } from "../../env.mjs";
+import { twMerge } from "tailwind-merge";
 
 const displayType: { [key: string]: string } = {
   row: "h-1/3 w-1/3",
@@ -19,14 +21,30 @@ const BlurImageItem = ({
   const { data: item } = api.items.getItemById.useQuery({
     id: itemId,
   });
+  const [imageUrl, setimageUrl] = useState(env.NEXT_PUBLIC_DEFAULT_IMAGE);
 
-  const router = useRouter();
+  useEffect(() => {
+    const fetchImg = async () => {
+      if (item?.imgPath) {
+        const isValid = await isImgUrl(item.imgPath);
+        if (isValid) {
+          setimageUrl(item.imgPath);
+        } else {
+          console.log("Invalid image url:", item.imgPath);
+        }
+      }
+    };
+    void fetchImg();
+  }, [item?.imgPath]);
 
   return (
-    <div className={`group/item relative ${displayType[type]}`} key={item?.id}>
+    <div
+      className={twMerge("group/item relative", displayType[type])}
+      key={item?.id}
+    >
       <img
         className="aspect-square opacity-100 duration-300 hover:opacity-80"
-        src={item?.imgPath}
+        src={imageUrl}
         alt={item?.name}
         key={item?.name}
       />

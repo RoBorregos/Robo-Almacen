@@ -65,9 +65,17 @@ const PrestamoDisplay = ({
             colorVariants[style.color]
           } `}
         >
-          {prestamos?.map((prestamo) => (
-            <BlurImagePrestamo idPrestamo={prestamo.id} type={style?.type} key={prestamo.id} />
-          ))}
+          {(prestamos && prestamos.length > 0) ? (
+            prestamos?.map((prestamo) => (
+              <BlurImagePrestamo
+                idPrestamo={prestamo.id}
+                type={style?.type}
+                key={prestamo.id}
+              />
+            ))
+          ) : (
+            <p>No hay artículos por mostrar</p>
+          )}
         </div>
       )}
     </div>

@@ -33,6 +33,7 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+    NEXT_PUBLIC_DEFAULT_IMAGE: z.string().url(),
   },
 
   /**
@@ -47,5 +48,6 @@ export const env = createEnv({
     AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
     AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
     AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
+    NEXT_PUBLIC_DEFAULT_IMAGE: process.env.NEXT_PUBLIC_DEFAULT_IMAGE,
   },
 });
