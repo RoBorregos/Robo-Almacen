@@ -6,7 +6,6 @@ import {
 } from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { env } from "rbgs/env.mjs";
 import { prisma } from "rbgs/server/db";
 
 /**

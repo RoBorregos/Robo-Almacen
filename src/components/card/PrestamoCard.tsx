@@ -1,6 +1,5 @@
 import { GeneralCard } from "./GeneralCard";
 import { api } from "../../utils/api";
-import { useState } from "react";
 
 // Prestamo card must contain:
 // Button to return items

@@ -3,6 +3,7 @@ import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import React, { useState } from "react";
 import BlurImagePrestamo from "./BlurImagePrestamo";
 import { ItemDisplayStyle } from "./ItemDisplay";
+import { twMerge } from "tailwind-merge";
 
 const colorVariants: { [key: string]: string } = {
   green: "border-emerald-500",
@@ -59,13 +60,13 @@ const PrestamoDisplay = ({
       )}
       {!isLoading && visible && (
         <div
-          className={`${
+          className={twMerge(
+            "flex flex-wrap items-center justify-between rounded-md border-8",
+            colorVariants[style.color],
             displayType[style.type]
-          } flex flex-wrap items-center justify-between rounded-md border-8 ${
-            colorVariants[style.color]
-          } `}
+          )}
         >
-          {(prestamos && prestamos.length > 0) ? (
+          {prestamos && prestamos.length > 0 ? (
             prestamos?.map((prestamo) => (
               <BlurImagePrestamo
                 idPrestamo={prestamo.id}

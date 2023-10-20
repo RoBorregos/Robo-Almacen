@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import {
   createTRPCRouter,
-  publicProcedure,
+  // publicProcedure,
   protectedProcedure,
 } from "rbgs/server/api/trpc";
 
@@ -22,7 +22,6 @@ export const itemsRouter = createTRPCRouter({
   getItemsId: protectedProcedure
     .input(z.object({ search: z.string() }))
     .query(({ input, ctx }) => {
-
       return ctx.prisma.item.findMany({
         where: {
           OR: [
@@ -67,7 +66,6 @@ export const itemsRouter = createTRPCRouter({
   getItemsSearch: protectedProcedure
     .input(z.object({ search: z.string() }))
     .query(({ input, ctx }) => {
-  
       return ctx.prisma.item.findMany({
         where: {
           OR: [
@@ -129,7 +127,7 @@ export const itemsRouter = createTRPCRouter({
         availableCount += item.quantity;
       });
 
-      const prestados = totalCount - availableCount;
+      // const prestados = totalCount - availableCount;
 
       const itemsPrestados = await ctx.prisma.celdaItem.findMany({
         where: {
@@ -152,5 +150,25 @@ export const itemsRouter = createTRPCRouter({
         availableCount,
         prestadosCount,
       };
+    }),
+
+  getItemAvailableCount: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const celdas = await ctx.prisma.celdaItem.findMany({
+        where: {
+          itemId: input.id,
+        },
+        select: {
+          quantity: true,
+        },
+      });
+
+      let availableCount = 0;
+      celdas.forEach((celda) => {
+        availableCount += celda.quantity;
+      });
+
+      return availableCount;
     }),
 });

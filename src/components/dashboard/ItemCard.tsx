@@ -21,7 +21,7 @@ const ItemCard = ({ item }: { item: Item | null | undefined }) => {
       <div className="inline h-56 w-56">
         <img
           className="aspect-square"
-          src={"/" + item?.imgPath}
+          src={"/" + (item?.imgPath ?? "")}
           alt={item?.name}
           key={item?.name}
         />

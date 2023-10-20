@@ -2,12 +2,12 @@
 import { faker } from "@faker-js/faker";
 
 import {
-  Item,
+  type Item,
   Account,
-  Prestamo,
-  User,
-  Celda,
-  CeldaItem,
+  type Prestamo,
+  type User,
+  type Celda,
+  type CeldaItem,
 } from "@prisma/client";
 
 // Functions to generate random objects of each type.
@@ -26,15 +26,16 @@ export function generateRandomItem(): Item {
 }
 
 export function generateRandomUser(): User {
-  let firstName = faker.person.firstName();
-  let lastName = faker.person.lastName();
-  let name = firstName + " " + lastName;
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const name = firstName + " " + lastName;
   return {
     id: faker.string.uuid(),
     name: name,
     email: faker.internet.email({ firstName: firstName, lastName: lastName }),
     emailVerified: faker.date.past(),
     image: "none",
+    hasData: false,
   };
 }
 
@@ -48,7 +49,8 @@ export function generateRandomPrestamo(): Prestamo {
     finalDate: faker.date.future(),
     quantity: faker.number.int({ min: 1, max: 10 }),
     returned: faker.datatype.boolean(),
-    celdaItemId: faker.string.uuid(),
+    itemId: faker.string.uuid(),
+    description: faker.commerce.productDescription(),
     userId: faker.string.uuid(),
   };
 }
@@ -70,7 +72,6 @@ export function generateRandomCeldaItem(): CeldaItem {
     createdAt: faker.date.past(),
     updatedAt: new Date(),
     quantity: faker.number.int({ min: 1, max: 10 }),
-    available: faker.number.int({ min: 1, max: 5 }),
     celdaId: faker.string.uuid(),
     itemId: faker.string.uuid(),
   };
@@ -78,29 +79,28 @@ export function generateRandomCeldaItem(): CeldaItem {
 
 // Registra un usuario y crea lo necesario para generar un pedido
 // Agrega todo a la base de datos.
-export async function generateNPrestamos(n: number, createUser: any, createCelda: any, createItem: any, createCeldaItem: any, createPrestamo: any) {
+// export async function generateNPrestamos(n: number, createUser: any, createCelda: any, createItem: any, createCeldaItem: any, createPrestamo: any) {
 
-  // Agregar prestamos a un usuario
-  const user = generateRandomUser();
+//   // Agregar prestamos a un usuario
+//   const user = generateRandomUser();
 
-  await createUser(user);
+//   await createUser(user);
 
-  for (let i = 0; i < n; i++) {
-    const celda = generateRandomCelda();
-    const item = generateRandomItem();
+//   for (let i = 0; i < n; i++) {
+//     const celda = generateRandomCelda();
+//     const item = generateRandomItem();
 
-    const celdaItem = generateRandomCeldaItem();
-    celdaItem.celdaId = celda.id;
-    celdaItem.itemId = item.id;
+//     const celdaItem = generateRandomCeldaItem();
+//     celdaItem.celdaId = celda.id;
+//     celdaItem.itemId = item.id;
 
-    const prestamo = generateRandomPrestamo();
-    prestamo.celdaItemId = celdaItem.id;
-    prestamo.userId = user.id;
+//     const prestamo = generateRandomPrestamo();
+//     prestamo.userId = user.id;
 
-    await createItem(item);
-    await createCelda(celda);
-    await createCeldaItem(celdaItem);
-    await createPrestamo(prestamo);
-  } 
-  console.log("Función generateNPrestamos ejecutada!");
-}
+//     await createItem(item);
+//     await createCelda(celda);
+//     await createCeldaItem(celdaItem);
+//     await createPrestamo(prestamo);
+//   } 
+//   console.log("Función generateNPrestamos ejecutada!");
+// }

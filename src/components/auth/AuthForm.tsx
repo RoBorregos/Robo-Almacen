@@ -2,10 +2,9 @@ import { Form, Formik } from "formik";
 import { CldUploadButton } from "next-cloudinary";
 import Input from "rbgs/components/auth/Input";
 import { api } from "rbgs/utils/api";
-import { SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import Avatar from "./Avatar";
 import User from "./User";
-import { string } from "zod";
 
 interface CldUploadWidgetResults {
     event?: string;

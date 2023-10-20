@@ -1,10 +1,4 @@
-import { z } from "zod";
-
-import {
-  createTRPCRouter,
-  publicProcedure,
-  protectedProcedure,
-} from "rbgs/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "rbgs/server/api/trpc";
 
 import {
   UserModel,
@@ -49,13 +43,13 @@ export const testsRouter = createTRPCRouter({
       });
     }),
 
-  createPrestamo: publicProcedure
-    .input(PrestamoModel)
-    .mutation(({ input, ctx }) => {
-      return ctx.prisma.prestamo.create({
-        data: {
-          ...input,
-        },
-      });
-    }),
+  // createPrestamo: publicProcedure
+  //   .input(PrestamoModel)
+  //   .mutation(({ input, ctx }) => {
+  //     return ctx.prisma.prestamo.create({
+  //       data: {
+  //         ...input,
+  //       },
+  //     });
+  //   }),
 });

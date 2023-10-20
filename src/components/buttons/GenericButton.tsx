@@ -1,11 +1,14 @@
 import * as React from "react";
+import { twMerge } from "tailwind-merge";
 
 const GenButton = ({
   title = "Boton",
   color = "red",
   size = "medium",
   className = "",
-  onclick = () => {console.log("Clicked button!");},
+  onclick = () => {
+    console.log("Clicked button!");
+  },
 }: {
   title?: string;
   color?: string;
@@ -31,7 +34,12 @@ const GenButton = ({
     <div>
       <button
         onClick={onclick}
-        className={`${colorVariants[color]} ${sizeVariants[size]} rounded-full p-3 align-middle font-bold duration-300 ${className}`}
+        className={twMerge(
+          "rounded-full p-3 align-middle font-bold duration-300",
+          colorVariants[color],
+          sizeVariants[size],
+          className
+        )}
       >
         {title}
       </button>

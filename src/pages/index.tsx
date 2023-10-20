@@ -1,56 +1,121 @@
 import { type NextPage } from "next";
+import { useState } from "react";
 import Layout from "rbgs/components/layout/Layout";
 import { api } from "rbgs/utils/api";
-import AuthShowcase from "rbgs/components/auth/SAMPLE_AuthShowCase";
-import { useState } from "react";
+import { CardContainer } from "rbgs/components/card/CardContainer";
+import { ItemCard } from "rbgs/components/card/ItemCard";
 
-const Home: NextPage = () => {
-  const utils = api.useContext();
-  const { data: Saludo, isLoading } = api.example.hello.useQuery({
-    text: "RoBorregos",
-  });
-  const { mutateAsync } = api.example.crear.useMutation();
-  const { data: ejemplos } = api.example.getAll.useQuery();
-  const [texto, setTexto] = useState("place holder");
+import { useSession } from "next-auth/react";
+import { PrestamoCard } from "rbgs/components/card/PrestamoCard";
+import { SearchBar } from "rbgs/components/search/SearchBar";
 
-  const handleCrear = async () => {
-    const asd = await mutateAsync({ name: texto });
-    await utils.example.getAll.invalidate();
-  };
+// TODO:
+// Añadir callbacks en componentes de Items.
+// Hacer diseño responsivo con media queries.
+
+const Dashboard: NextPage = () => {
+  const { status } = useSession();
+
+  const [display, setDisplay] = useState("items");
+  const [searchText, setSearchText] = useState("");
+
+  if (status === "unauthenticated") {
+    return (
+      <Layout>
+        <h1 className="text-4xl font-bold text-white">
+          Inicia sesión para acceder a esta página.
+        </h1>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout>
-      <div className="flex flex-col items-center justify-center gap-4">
-        <h1 className="text-center text-4xl font-bold text-white">
-          Almacén 🥵
-        </h1>
-        {isLoading ? (
-          <p className="text-center text-2xl font-bold text-white">
-            Cargando...
-          </p>
-        ) : (
-          <p className="text-center text-2xl text-white">{Saludo?.greeting}</p>
-        )}
-        <input
-          className="rounded-md bg-white/10 px-4 py-2 text-white"
-          type="text"
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-        />
-        <button
-          className="rounded-md bg-blue-500 px-4 py-2 text-white"
-          onClick={() => void handleCrear()}
-        >
-        </button>
-        {ejemplos?.map((ejemplo, id) => (
-          <p className="text-center text-2xl text-white" key={id}>
-            {ejemplo.name}
-          </p>
-        ))}
-        <AuthShowcase/>
+    <Layout className="justify-start">
+      <div className="mt-3 flex w-full flex-col justify-start">
+        <div className="my-2 flex w-full flex-row flex-wrap justify-center space-x-3">
+          <button
+            className="rounded-md bg-blue-500 px-4 py-2 text-white"
+            onClick={() => setDisplay("items")}
+          >
+            Items
+          </button>
+          <button
+            className="rounded-md bg-blue-500 px-4 py-2 text-white"
+            onClick={() => setDisplay("prestamos")}
+          >
+            Préstamos
+          </button>
+          <button
+            className="rounded-md bg-blue-500 px-4 py-2 text-white"
+            onClick={() => setDisplay("historial")}
+          >
+            Historial
+          </button>
+          <div className="w-6/12">
+            <SearchBar setUpdateSearch={setSearchText} />
+          </div>
+        </div>
+        <PageContent searchText={searchText} display={display} />
       </div>
     </Layout>
   );
 };
 
-export default Home;
+const PageContent = ({
+  display,
+  searchText,
+}: {
+  display: string;
+  searchText: string;
+}) => {
+  if (display === "items") return <ItemContainer search={searchText} />;
+  if (display === "historial")
+    return <HistorialContainer search={searchText} />;
+  if (display === "prestamos") return <PrestamoContainer search={searchText} />;
+  return <p>Error, invalid display type</p>;
+};
+
+const ItemContainer = ({ search }: { search?: string }) => {
+  const { data: itemId, isLoading } = api.items.getItemsId.useQuery({
+    search: search ?? "",
+  });
+
+  return (
+    <CardContainer>
+      {itemId?.map((item, id) => (
+        <ItemCard id={item.id} key={id} />
+      ))}
+    </CardContainer>
+  );
+};
+
+const HistorialContainer = ({ search }: { search?: string }) => {
+  const { data: prestamoIDs } = api.prestamos.getPrestamosId.useQuery({
+    search: search ?? "",
+    type: "inactivo",
+  });
+
+  return (
+    <CardContainer>
+      {prestamoIDs?.map((prestamo, id) => (
+        <PrestamoCard id={prestamo.id} showUser={true} key={id} />
+      ))}
+    </CardContainer>
+  );
+};
+const PrestamoContainer = ({ search }: { search?: string }) => {
+  const { data: prestamoIDs } = api.prestamos.getPrestamosId.useQuery({
+    search: search ?? "",
+    type: "activo",
+  });
+
+  return (
+    <CardContainer>
+      {prestamoIDs?.map((prestamo, id) => (
+        <PrestamoCard id={prestamo.id} showUser={true} key={id} />
+      ))}
+    </CardContainer>
+  );
+};
+
+export default Dashboard;

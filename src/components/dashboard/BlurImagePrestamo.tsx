@@ -23,7 +23,7 @@ const BlurImagePrestamo = ({
   const { data: prestamo } = api.prestamos.getPrestamoDetailsById.useQuery({
     id: idPrestamo,
   });
-  const item: Item | undefined = prestamo?.CeldaItem.Item;
+  const item: Item | undefined = prestamo?.Item;
 
   const router = useRouter();
 
@@ -41,8 +41,10 @@ const BlurImagePrestamo = ({
       <div className="absolute top-0 w-full text-center text-white duration-300">
         <h1 className="bg-black/50">
           {prestamo?.finalDate
-            ? "Fecha final: " + prestamo?.finalDate?.toDateString()
-            : "Fecha de inicio: " + prestamo?.initialDate?.toDateString()}
+            ? "Fecha final: " +
+              (prestamo?.finalDate?.toDateString() ?? "Indefinido")
+            : "Fecha de inicio: " +
+              (prestamo?.initialDate?.toDateString() ?? "Indefinido")}
         </h1>
         <h2 className="pl-3 text-left font-bold opacity-0 duration-300 group-hover/item:bg-black/50 group-hover/item:opacity-100">
           {item?.name}, Cantidad: {prestamo?.quantity}
@@ -54,9 +56,6 @@ const BlurImagePrestamo = ({
           title="Ver préstamos de material"
           size="large"
           className="absolute bottom-2 right-1/2 translate-x-1/2 opacity-0 duration-300 group-hover/item:opacity-100"
-          onclick={() => {
-            router.push(`/dashboard/${item?.id}`);
-          }}
         />
       ) : (
         <GenButton

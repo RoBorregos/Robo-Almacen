@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import {
   createTRPCRouter,
-  publicProcedure,
+//   publicProcedure,
   protectedProcedure,
 } from "rbgs/server/api/trpc";
 
@@ -322,7 +322,7 @@ export const prestamosRouter = createTRPCRouter({
       });
 
       // Select a random cell.
-      let returnCell = await ctx.prisma.celdaItem.findFirst({});
+      const returnCell = await ctx.prisma.celdaItem.findFirst({});
 
       if (celdaItem) {
         // Store the items in the cell that has the most of the returned item.
@@ -359,7 +359,7 @@ export const prestamosRouter = createTRPCRouter({
               quantity: (returnCell?.quantity ?? 0) + prestamo.quantity,
             },
           });
-          tx.prestamo.update({
+          await tx.prestamo.update({
             where: {
               id: input.id,
             },
