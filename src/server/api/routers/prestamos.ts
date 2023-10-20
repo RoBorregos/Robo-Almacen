@@ -282,7 +282,12 @@ export const prestamosRouter = createTRPCRouter({
         // open(openCells);
       });
 
-      return "Préstamo creado exitosamente.";
+      // TODO: send easy to interpret message to open the cell.
+      return (
+        "Préstamo creado exitosamente, abra las celda(s): " +
+        openCells.join(", ") +
+        " para obtener los items."
+      );
     }),
   returnPrestamo: protectedProcedure
     .input(
@@ -382,7 +387,7 @@ export const prestamosRouter = createTRPCRouter({
           message: "Error inesperado.",
         });
       }
-
-      return "La celda fue abierta y el prestamo fue devuelto exitosamente.";
+      // TODO: send easy to interpret message to open the cell.
+      return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
 });
