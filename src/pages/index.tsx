@@ -112,7 +112,7 @@ const PrestamoContainer = ({ search }: { search?: string }) => {
   return (
     <CardContainer>
       {prestamoIDs?.map((prestamo, id) => (
-        <PrestamoCard id={prestamo.id} showUser={true} key={id} />
+        <PrestamoCard id={prestamo.id} showUser={false} key={id} />
       ))}
     </CardContainer>
   );

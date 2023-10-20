@@ -1,4 +1,4 @@
-import { GeneralCard } from "./GeneralCard";
+import { VerticalGeneralCard } from "./VerticalGeneralCard";
 import { api } from "../../utils/api";
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import { useState } from "react";
@@ -21,6 +21,10 @@ export const ItemCard = ({
     id: id,
   });
 
+  const {data: availableCount} = api.items.getItemAvailableCount.useQuery({
+    id: id,
+  });
+
   const createPrestamo = api.prestamos.createPrestamo.useMutation({
     onSuccess: (message) => {
       alert(message);
@@ -36,17 +40,17 @@ export const ItemCard = ({
 
   if (isLoading) {
     return (
-      <GeneralCard className={className}>
+      <VerticalGeneralCard className={className}>
         <h6 className="text-center text-4xl font-bold text-white">
           Cargando...
         </h6>
-      </GeneralCard>
+      </VerticalGeneralCard>
     );
   } else if (item) {
     return (
-      <GeneralCard
+      <VerticalGeneralCard
         className={className}
-        title={item.name}
+        title={item.name + " - (" + (availableCount ? availableCount.toString() : "cargando...") + " disponibles)"}
         imageLink={item.imgPath}
       >
         <div className="flex flex-col">
@@ -65,7 +69,8 @@ export const ItemCard = ({
               className="text-black"
               size={40}
               onClick={() => {
-                setAmount(amount + 1);
+                const maxPossible = Math.min(amount + 1, availableCount ?? 0);
+                setAmount(maxPossible);
               }}
             />
           </div>
@@ -89,15 +94,15 @@ export const ItemCard = ({
             Pedir {amount} {item.name}
           </button>
         </div>
-      </GeneralCard>
+      </VerticalGeneralCard>
     );
   } else {
     return (
-      <GeneralCard className={className}>
+      <VerticalGeneralCard className={className}>
         <h6 className="text-center text-4xl font-bold text-white">
           No se encontró el artículo
         </h6>
-      </GeneralCard>
+      </VerticalGeneralCard>
     );
   }
 };

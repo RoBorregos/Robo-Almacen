@@ -1,4 +1,4 @@
-import { GeneralCard } from "./GeneralCard";
+import { HorizontalGeneralCard } from "./HorizontalGeneralCard";
 import { api } from "../../utils/api";
 
 // Prestamo card must contain:
@@ -31,18 +31,21 @@ export const PrestamoCard = ({
 
   if (isLoading) {
     return (
-      <GeneralCard>
+      <HorizontalGeneralCard>
         <h6 className="text-center text-4xl font-bold text-white">
           Cargando...
         </h6>
-      </GeneralCard>
+      </HorizontalGeneralCard>
     );
   } else if (prestamo) {
     return (
-      <GeneralCard title={prestamo.Item.name} imageLink={prestamo.Item.imgPath}>
+      <HorizontalGeneralCard
+        title={prestamo.Item.name}
+        imageLink={prestamo.Item.imgPath}
+        className="my-2"
+      >
         <div className="flex flex-col">
           <div className="align-middl mb-6 mt-2 flex h-20 w-full flex-col justify-around text-black">
-            <h3>Detalles del préstamo</h3>
             <p>
               Descripción:{" "}
               {prestamo.description === ""
@@ -65,15 +68,15 @@ export const PrestamoCard = ({
             </button>
           )}
         </div>
-      </GeneralCard>
+      </HorizontalGeneralCard>
     );
   } else {
     return (
-      <GeneralCard>
+      <HorizontalGeneralCard>
         <h6 className="text-center text-4xl font-bold text-white">
           No se encontró el préstamo
         </h6>
-      </GeneralCard>
+      </HorizontalGeneralCard>
     );
   }
 };

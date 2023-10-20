@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import {
   createTRPCRouter,
-//   publicProcedure,
+  //   publicProcedure,
   protectedProcedure,
 } from "rbgs/server/api/trpc";
 
@@ -78,6 +78,7 @@ export const prestamosRouter = createTRPCRouter({
           User: {
             select: {
               name: true,
+              id: true,
             },
           },
         },

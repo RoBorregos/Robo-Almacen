@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { isImgUrl } from "../../utils/image";
 import { twMerge } from "tailwind-merge";
 
-export const GeneralCard = ({
+export const HorizontalGeneralCard = ({
   children,
   title = "Card",
   imageLink,
@@ -32,22 +32,23 @@ export const GeneralCard = ({
   }, [imageLink]);
 
   return (
-    <div
+    <a
       className={twMerge(
-        "mt-2 max-w-sm rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800",
+        "flex flex-col items-center rounded-lg border border-gray-200 bg-white shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 md:flex-row",
         className
       )}
     >
-      <img className="rounded-t-lg" src={imageUrl} alt="" />
-
-      <div className="p-5">
-        <a href="#">
-          <h5 className="mb-2 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {title}
-          </h5>
-        </a>
+      <img
+        className="h-96 w-full rounded-t-lg object-cover md:h-auto md:w-48 md:rounded-none md:rounded-l-lg"
+        src={imageUrl}
+        alt=""
+      />
+      <div className="flex flex-col justify-between p-4 leading-normal">
+        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          {title}
+        </h5>
         {children}
       </div>
-    </div>
+    </a>
   );
 };
