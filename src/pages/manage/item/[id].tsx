@@ -11,7 +11,7 @@ const Items: NextPage = () => {
   const router = useRouter();
 
   const { data: item, isLoading: isLoadingItem } = api.item.getOne.useQuery({
-    id: router.query.id as string,
+    id: router.query.id as string ?? "",
   });
   const { mutateAsync: mutateAsyncItem } = api.item.update.useMutation();
 
@@ -21,8 +21,10 @@ const Items: NextPage = () => {
     category: string;
     department: string;
   }) => {
+    console.log(router.query.id, data);
     await mutateAsyncItem({ id: router.query.id as string, ...data });
     await utils.item.getAll.invalidate();
+    await router.push("/manage/items")
   };
 
   return isLoadingItem || !item ? (
