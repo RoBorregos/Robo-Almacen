@@ -21,7 +21,7 @@ export const userDataRouter = createTRPCRouter({
                     area: input.area,
                     phone: input.phone,
                     image: input.image,
-                    user: {
+                    User: {
                         connect: {
                             id: input.userId
                         }
@@ -90,7 +90,7 @@ export const userDataRouter = createTRPCRouter({
     .query(({ input, ctx }) => {
         return ctx.prisma.userData.findFirst({
             where: {
-                user :{
+                User :{
                     id: input.id
                 }
             }

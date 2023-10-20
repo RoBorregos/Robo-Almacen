@@ -34,13 +34,12 @@ export const GeneralCard = ({
   return (
     <div
       className={twMerge(
-        "max-w-sm rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800",
+        "mt-2 max-w-sm rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800",
         className
       )}
     >
-      <a href="#">
-        <img className="rounded-t-lg" src={imageUrl} alt="" />
-      </a>
+      <img className="rounded-t-lg" src={imageUrl} alt="" />
+
       <div className="p-5">
         <a href="#">
           <h5 className="mb-2 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
