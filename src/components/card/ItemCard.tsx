@@ -2,6 +2,7 @@ import { VerticalGeneralCard } from "./VerticalGeneralCard";
 import { api } from "../../utils/api";
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 // Item Card must contain:
 // Buttons to edit order amount
@@ -21,17 +22,35 @@ export const ItemCard = ({
     id: id,
   });
 
-  const {data: availableCount} = api.items.getItemAvailableCount.useQuery({
+  const { data: availableCount } = api.items.getItemAvailableCount.useQuery({
     id: id,
   });
 
   const createPrestamo = api.prestamos.createPrestamo.useMutation({
     onSuccess: (message) => {
-      alert(message);
+      toast.success(message, {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
       void context.items.getItemCounts.invalidate();
     },
     onError: (error) => {
-      alert(error);
+      toast.error(error.message, {
+        position: "top-center",
+        autoClose: 10000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
     },
   });
 
@@ -50,7 +69,12 @@ export const ItemCard = ({
     return (
       <VerticalGeneralCard
         className={className}
-        title={item.name + " - (" + (availableCount ? availableCount.toString() : "cargando...") + " disponibles)"}
+        title={
+          item.name +
+          " - (" +
+          (availableCount !== undefined ? availableCount.toString() : "cargando...") +
+          " disponibles)"
+        }
         imageLink={item.imgPath}
       >
         <div className="flex flex-col">

@@ -31,6 +31,7 @@ export const HorizontalGeneralCard = ({
     void fetchImg();
   }, [imageLink]);
 
+  // https://flowbite.com/docs/components/card/
   return (
     <a
       className={twMerge(

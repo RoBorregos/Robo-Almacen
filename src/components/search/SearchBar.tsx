@@ -10,7 +10,8 @@ export const SearchBar = ({
 }) => {
   const [text, setText] = useState("");
 
-  return (
+  // https://flowbite.com/docs/forms/search-input/#search-bar-example
+  return ( 
     <div>
       <label className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Search
