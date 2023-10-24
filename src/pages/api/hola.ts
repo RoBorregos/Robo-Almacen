@@ -10,6 +10,6 @@ export default function handler(
     
 ) {
     console.log(req.body, "req")
-    console.log(req.headers.requestContext, "req")
+    console.log(req.headers, "req")
     res.status(200).json({ message: 'Hello from Next.js!' })
 }
