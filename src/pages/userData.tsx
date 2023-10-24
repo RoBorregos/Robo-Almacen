@@ -6,7 +6,7 @@ import axios from "axios";
 
 const UserData: NextPage = () => {
     const handleClick = () => {
-        axios.post('server/api/test', {
+        axios.post('/api/hola', {
             body: "hii"
 
         }).then((res) => {
