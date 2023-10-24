@@ -21,6 +21,7 @@
     "@trpc/next": "^10.18.0",
     "@trpc/react-query": "^10.18.0",
     "@trpc/server": "^10.18.0",
+    "axios": "^1.5.1",
     "formik": "^2.4.4",
     "next": "^13.4.1",
     "next-auth": "^4.19.0",
