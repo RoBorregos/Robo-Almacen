@@ -36,6 +36,7 @@ export function generateRandomUser(): User {
     emailVerified: faker.date.past(),
     image: "none",
     hasData: false,
+    role: "USER",
   };
 }
 
@@ -101,6 +102,6 @@ export function generateRandomCeldaItem(): CeldaItem {
 //     await createCelda(celda);
 //     await createCeldaItem(celdaItem);
 //     await createPrestamo(prestamo);
-//   } 
+//   }
 //   console.log("Función generateNPrestamos ejecutada!");
 // }
