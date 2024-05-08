@@ -4,6 +4,8 @@ import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
+  memberProcedure,
+  adminProcedure,
 } from "rbgs/server/api/trpc";
 export const exampleRouter = createTRPCRouter({
   hello: publicProcedure
@@ -30,5 +32,13 @@ export const exampleRouter = createTRPCRouter({
 
   getSecretMessage: protectedProcedure.query(({ ctx }) => {
     return "you can now see this secret message!";
+  }),
+
+  getMemberMessage: memberProcedure.query(({ ctx: _ctx }) => {
+    return "you are a member!";
+  }),
+
+  getAdminMessage: adminProcedure.query(({ ctx: _ctx }) => {
+    return "you are an admin!";
   }),
 });

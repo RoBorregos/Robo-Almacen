@@ -9,6 +9,11 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "rbgs/server/db";
 
 /**
+ * User roles for access control.
+ */
+export type UserRole = "USER" | "MEMBER" | "ADMIN";
+
+/**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
  *
@@ -18,15 +23,14 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      role: UserRole;
       // ...other properties
-      // role: UserRole;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    role: UserRole;
+  }
 }
 
 /**
@@ -39,7 +43,7 @@ export const authOptions: NextAuthOptions = {
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
-        // session.user.role = user.role; <-- put other properties on the session here
+        session.user.role = user.role;
       }
       return session;
     },
