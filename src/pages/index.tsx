@@ -76,7 +76,7 @@ const PageContent = ({
 };
 
 const ItemContainer = ({ search }: { search?: string }) => {
-  const { data: itemId, isLoading } = api.items.getItemsId.useQuery({
+  const { data: itemId } = api.items.getAvailableItemIds.useQuery({
     search: search ?? "",
   });
 

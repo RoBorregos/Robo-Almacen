@@ -105,7 +105,7 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
             <div className="flex flex-col items-center">
                 <CldUploadButton
                     options={{ maxFiles: 1 }}
-                    onUpload={(result) => handleUpload(result)}
+                    // onUpload={(result) => handleUpload(result)}
                     uploadPreset="cerid1mq"
                 >
                     <Avatar image={userData?.image || 'Logo2.svg'} edit />
