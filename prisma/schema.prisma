@@ -50,6 +50,7 @@ model User {
   image         String?
   hasData       Boolean    @default(false)
   role          String     @default("USER")
+  RFID          String?    @unique
   accounts      Account[]
   Prestamo      Prestamo[]
   sessions      Session[]

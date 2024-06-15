@@ -2,14 +2,24 @@ import logo from './public/Letras.png';
 import { useSession } from "next-auth/react";
 import { signOut, signIn } from "next-auth/react";
 
+import { allowedRole } from 'rbgs/utils/roles';
+
 const color = "text-slate-950 hover:text-sky-800";
 
 const NavBar = ({
   routes,
 }: {
-  routes: { name: string; path: string }[];
+  routes: { name: string; path: string, roles?: string[]}[];
 }) => {
   const { data: sessionData } = useSession();
+
+  const filteredRoutes = routes.filter((route) => {
+    if (route.roles) {
+      return allowedRole({ role: sessionData?.user.role, allowed: route.roles });
+    }
+    return true;
+  }
+  );
 
   return (
     <div className="w-full bg-sky-100 h-16 flex">
@@ -18,7 +28,7 @@ const NavBar = ({
           <ul className="flex items-center">
           <img src="/Logo2.svg" alt="Logo" style={{ width: "70px", height: "50px" }}/>
           <img src="/Letras.png" alt ="Letras" style={{ width: "180px", height: "30px" }}/>
-            {routes.map((route) => (
+            {filteredRoutes.map((route) => (
               <li className="mr-6 inline-block" key={route.name}>
                 <a className={color} href={route.path}>
                   {route.name}
