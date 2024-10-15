@@ -32,21 +32,21 @@ const Dashboard: NextPage = () => {
   return (
     <Layout className="justify-start">
       <div className="mt-3 flex w-full flex-col justify-start">
-        <div className="my-2 flex w-full flex-row flex-wrap justify-center space-x-3">
+        <div className="my-5 flex w-full flex-row flex-wrap justify-center space-x-3">
           <button
-            className="rounded-md bg-blue-500 px-4 py-2 text-white"
+            className={`rounded-md transition duration-300 hover:bg-blue-800 bg-blue-700 px-4 py-2 text-white ${display === "items" ? "bg-blue-800" : ""}`}
             onClick={() => setDisplay("items")}
           >
             Items
           </button>
           <button
-            className="rounded-md bg-blue-500 px-4 py-2 text-white"
+            className={`rounded-md transition duration-300 hover:bg-blue-800 bg-blue-700 px-4 py-2 text-white ${display === "prestamos" ? "bg-blue-800" : ""}`}
             onClick={() => setDisplay("prestamos")}
           >
             Préstamos
           </button>
           <button
-            className="rounded-md bg-blue-500 px-4 py-2 text-white"
+            className={`rounded-md transition duration-300 hover:bg-blue-800 bg-blue-700 px-4 py-2 text-white ${display === "historial" ? "bg-blue-800" : ""}`}
             onClick={() => setDisplay("historial")}
           >
             Historial

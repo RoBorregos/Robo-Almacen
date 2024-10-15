@@ -41,11 +41,11 @@ export const VerticalGeneralCard = ({
       <img className="rounded-t-lg" src={imageUrl} alt="" />
 
       <div className="p-5">
-        <a href="#">
+        {/* <a href="#"> */}
           <h5 className="mb-2 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             {title}
           </h5>
-        </a>
+        {/* </a> */}
         {children}
       </div>
     </div>

@@ -1,11 +1,12 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["jsonProtocol"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = "mysql://root:@localhost:3306/AlmacenLocal"
+  // provider = "postgresql"
+  // url      = env("DATABASE_URL")
 }
 
 model Example {
@@ -50,6 +51,7 @@ model User {
   image         String?
   hasData       Boolean    @default(false)
   role          String     @default("USER")
+  RFIDtoken     String?
   accounts      Account[]
   Prestamo      Prestamo[]
   sessions      Session[]
@@ -72,6 +74,7 @@ model Celda {
   row       Int
   column    Int
   CeldaItem CeldaItem[]
+  Prestamo  Prestamo[]
 }
 
 model CeldaItem {
@@ -107,10 +110,13 @@ model Prestamo {
   quantity    Int
   userId      String
   returned    Boolean   @default(false)
+  issued      Boolean   @default(false)
   itemId      String
   description String    @default("")
+  celdaId     String
   Item        Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
   User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Celda       Celda     @relation(fields: [celdaId], references: [id], onDelete: Cascade)
 }
 
 model Telemetry {

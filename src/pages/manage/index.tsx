@@ -10,8 +10,8 @@ const Grid: NextPage = () => {
   const router = useRouter();
 
   // Generate grid data
-  const gridWidth = 100;
-  const gridHeight = 8;
+  const gridWidth = 1;
+  const gridHeight = 4;
   const gridData = Array.from({ length: gridHeight }, () =>
     Array.from({ length: gridWidth }, () => ({
       name: "",
@@ -154,14 +154,14 @@ const Grid: NextPage = () => {
 
   return (
     <Layout>
-      <div className="-z-0 row-auto mt-16 grid min-h-[90vh] w-full grid-flow-row overflow-x-auto overflow-y-clip">
+      <div className="-z-0 row-auto grid w-full grid-flow-row overflow-x-auto overflow-y-clip justify-items-center">
         {/* Render the grid */}
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="col-auto grid grid-flow-col">
             {row.map((cell, cellIndex) => (
               <div
                 key={cellIndex}
-                className="group flex h-auto w-20 items-center justify-center border border-gray-300"
+                className="group flex h-fit p-10 w-40 items-center justify-center border border-gray-300"
               >
                 {cell.id !== "" ? (
                   <div>

@@ -12,12 +12,16 @@ const NavBar = ({
   const { data: sessionData } = useSession();
 
   return (
-    <div className="w-full bg-sky-100 h-16 flex">
-      <div className="flex-1 flex items-center justify-center">
+    <div className="w-full h-16 grid grid-cols-3 px-10 justify-evenly font-mono">
+      {/* Left logos */}
+      <div className='flex items-center justify-center'>
+        <img src="/Logo2.svg" alt="Logo" style={{ width: "70px", height: "50px" }}/>
+        <img src="/Letras.png" alt ="Letras" style={{ width: "180px", height: "30px" }}/>
+      </div>
+      {/* Center letters */}
+      <div className="flex items-center justify-center">
         <div className="flex mb-0">
-          <ul className="flex items-center">
-          <img src="/Logo2.svg" alt="Logo" style={{ width: "70px", height: "50px" }}/>
-          <img src="/Letras.png" alt ="Letras" style={{ width: "180px", height: "30px" }}/>
+          <ul className="flex items-center text-lg">
             {routes.map((route) => (
               <li className="mr-6 inline-block" key={route.name}>
                 <a className={color} href={route.path}>
@@ -28,11 +32,12 @@ const NavBar = ({
           </ul>
         </div>
       </div>
-      <div className="flex-1 flex justify-end items-center">
+      {/* Right account buttons */}
+      <div className="flex justify-end items-center">
         <div className="flex justify-center">
           <button 
           onClick={sessionData ? () => void signOut() : () => void signIn()}
-          className="bg-blue-500 mr-12 hover:bg-blue-600 bg-opacity-80 text-gray-100 font-inter py-1 px-4 border rounded ">
+          className="bg-blue-700 mr-12 transition duration-300 hover:bg-blue-800 text-gray-100 font-inter py-1 px-4 border rounded-lg">
             {sessionData ? "Sign out" : "Sign in"}
           </button>
         </div>

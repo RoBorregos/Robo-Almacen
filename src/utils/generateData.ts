@@ -37,6 +37,7 @@ export function generateRandomUser(): User {
     image: "none",
     hasData: false,
     role: "USER",
+    RFIDtoken: faker.string.uuid(),
   };
 }
 
@@ -53,6 +54,8 @@ export function generateRandomPrestamo(): Prestamo {
     itemId: faker.string.uuid(),
     description: faker.commerce.productDescription(),
     userId: faker.string.uuid(),
+    celdaId: faker.string.uuid(),
+    issued: faker.datatype.boolean(),
   };
 }
 
