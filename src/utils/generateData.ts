@@ -31,6 +31,7 @@ export function generateRandomUser(): User {
   const name = firstName + " " + lastName;
   return {
     id: faker.string.uuid(),
+    RFID: faker.string.uuid(),
     name: name,
     email: faker.internet.email({ firstName: firstName, lastName: lastName }),
     emailVerified: faker.date.past(),
