@@ -44,18 +44,19 @@ model Session {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?    @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
-  hasData       Boolean    @default(false)
-  role          String     @default("USER")
-  RFIDtoken     String?
-  accounts      Account[]
-  Prestamo      Prestamo[]
-  sessions      Session[]
-  UserData      UserData?
+  hasData       Boolean   @default(false)
+  role          String    @default("USER")
+  RFID          String?   @unique
+
+  accounts Account[]
+  Prestamo Prestamo[]
+  sessions Session[]
+  UserData UserData?
 }
 
 model VerificationToken {

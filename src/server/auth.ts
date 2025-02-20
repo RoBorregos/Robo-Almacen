@@ -4,9 +4,12 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import AzureADProvider from "next-auth/providers/azure-ad";
+// import AzureADProvider from "next-auth/providers/azure-ad";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "rbgs/server/db";
+import GoogleProvider from "next-auth/providers/google";
+
+import { env } from "rbgs/env.mjs";
 
 /**
  * User roles for access control.
@@ -47,13 +50,28 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    signIn({ account, profile }) {
+      if (account?.provider === "google") {
+        const allowedDomain = "tec.mx";
+        if (profile?.email && profile.email.endsWith(`@${allowedDomain}`)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      return true;
+    },
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    AzureADProvider({
-      clientId: process.env.AZURE_AD_CLIENT_ID as string,
-      clientSecret: process.env.AZURE_AD_CLIENT_SECRET as string,
-      tenantId: process.env.AZURE_AD_TENANT_ID,
+    // AzureADProvider({
+    //   clientId: process.env.AZURE_AD_CLIENT_ID as string,
+    //   clientSecret: process.env.AZURE_AD_CLIENT_SECRET as string,
+    //   tenantId: process.env.AZURE_AD_TENANT_ID,
+    // }),
+    GoogleProvider({
+      clientId: env.GOOGLE_ID,
+      clientSecret: env.GOOGLE_SECRET,
     }),
     /**
      * ...add more providers here.
