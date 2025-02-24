@@ -121,7 +121,7 @@ export const celdaRouter = createTRPCRouter({
         },
       });
     }),
-  
+
   getCeldasWithItemId: publicProcedure
     .input(
       z.object({

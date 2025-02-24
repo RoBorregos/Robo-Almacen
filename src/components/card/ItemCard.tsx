@@ -128,7 +128,8 @@ export const ItemCard = ({
                 Pedir {amount} {item.name}
               </button>
             </DialogTrigger>
-            <DialogContent className="fixed inset-0 flex items-center justify-center bg-transparent">
+            <DialogContent className="fixed inset-0 flex items-center justify-center bg-transparent z-10">
+              <div className="fixed inset-0 bg-black opacity-50 -z-10" />
               <div className="bg-white p-10 rounded-lg shadow-lg w-fit">
                 <DialogHeader>
                   <DialogTitle className="w-full text-center mb-3 text-lg font-mono">Casilleros disponibles</DialogTitle>

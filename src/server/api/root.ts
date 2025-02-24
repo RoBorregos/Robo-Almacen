@@ -6,6 +6,7 @@ import { prestamosRouter } from "./routers/prestamos";
 import { celdaRouter } from "rbgs/server/api/routers/celdaApi";
 import { itemRouter } from "rbgs/server/api/routers/itemApi";
 import { userDataRouter } from "./routers/userData";
+import { groupRouter } from "./routers/group";
 
 /**
  * This is the primary router for your server.
@@ -20,9 +21,8 @@ export const appRouter = createTRPCRouter({
   prestamos: prestamosRouter,
   items: itemsRouter,
   tests: testsRouter,
+  group: groupRouter,
 });
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
-
-

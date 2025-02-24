@@ -42,16 +42,6 @@ const NavBar = ({
       <div className="flex items-center justify-center">
         <div className="mb-0 flex">
           <ul className="flex items-center">
-            <img
-              src="/Logo2.svg"
-              alt="Logo"
-              style={{ width: "70px", height: "50px" }}
-            />
-            <img
-              src="/Letras.png"
-              alt="Letras"
-              style={{ width: "180px", height: "30px" }}
-            />
             {filteredRoutes.map((route) => (
               <li className="mr-6 inline-block" key={route.name}>
                 <a className={color} href={route.path}>
@@ -59,6 +49,13 @@ const NavBar = ({
                 </a>
               </li>
             ))}
+            {sessionData?.user.role === "ADMIN" && (
+              <li className="mr-6 inline-block">
+                <a className={color} href="/admin">
+                  Admin
+                </a>
+              </li>
+            )}
           </ul>
         </div>
       </div>
@@ -66,7 +63,7 @@ const NavBar = ({
       <div className="flex items-center justify-end">
         <div className="flex justify-center">
           <button
-            onClick={sessionData ? () => void signOut() : () => void signIn()}
+            onClick={sessionData ? () => signOut() : () => signIn()}
             className="font-inter mr-12 rounded-lg border bg-blue-700 px-4 py-1 text-gray-100 transition duration-300 hover:bg-blue-800"
           >
             {sessionData ? "Sign out" : "Sign in"}

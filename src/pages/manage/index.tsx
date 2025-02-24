@@ -4,8 +4,12 @@ import { api } from "rbgs/utils/api";
 // import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 const Grid: NextPage = () => {
+  const { data: sessionData } = useSession();
+  // const
+
   const utils = api.useContext();
   const router = useRouter();
 
@@ -154,19 +158,19 @@ const Grid: NextPage = () => {
 
   return (
     <Layout>
-      <div className="-z-0 row-auto grid w-full grid-flow-row overflow-x-auto overflow-y-clip justify-items-center">
+      <div className="-z-0 row-auto grid w-full grid-flow-row justify-items-center overflow-x-auto overflow-y-clip">
         {/* Render the grid */}
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="col-auto grid grid-flow-col">
             {row.map((cell, cellIndex) => (
               <div
                 key={cellIndex}
-                className="group flex h-fit p-10 w-40 items-center justify-center border border-gray-300"
+                className="group flex h-fit w-40 items-center justify-center border border-gray-300 p-10"
               >
                 {cell.id !== "" ? (
                   <div>
                     <button
-                      className="rounded-3xl bg-blue-400 px-2 py-1 font-bold text-white hover:bg-blue-700 transition ease-in-out delay-10 hover:scale-125 duration-300"
+                      className="delay-10 rounded-3xl bg-blue-400 px-2 py-1 font-bold text-white transition duration-300 ease-in-out hover:scale-125 hover:bg-blue-700"
                       // popovertarget={cell.id}
                       onClick={() => {
                         console.log("cell", cell);
@@ -175,7 +179,13 @@ const Grid: NextPage = () => {
                           cell.id
                         ) as HTMLDialogElement;
                         if (dialog) {
-                          selectedModal.column === cellIndex && selectedModal.row === rowIndex ? setSelectedModal({ row: -1, column: -1 }) : setSelectedModal({ row: rowIndex, column: cellIndex });
+                          selectedModal.column === cellIndex &&
+                          selectedModal.row === rowIndex
+                            ? setSelectedModal({ row: -1, column: -1 })
+                            : setSelectedModal({
+                                row: rowIndex,
+                                column: cellIndex,
+                              });
                           dialog.open ? dialog.close() : dialog.show();
                           console.log("selectedModal", selectedModal);
                         }
@@ -186,57 +196,65 @@ const Grid: NextPage = () => {
                     </button>
 
                     <div className="relative">
-                    {/* <div className={"relative" + (selectedModal.column === cellIndex && selectedModal.row === rowIndex ? " visible transition ease-in-out delay-150 bg-blue-500 -translate-y-1 scale-110 duration-300" : " ")} > */}
+                      {/* <div className={"relative" + (selectedModal.column === cellIndex && selectedModal.row === rowIndex ? " visible transition ease-in-out delay-150 bg-blue-500 -translate-y-1 scale-110 duration-300" : " ")} > */}
                       <dialog
                         className={
                           "absolute right-9 rounded-lg bg-white p-5 shadow-lg shadow-cyan-500/50 " +
                           (rowIndex > gridHeight / 2 - 1
                             ? " bottom-16"
                             : " top-5") +
-                          (cellIndex > gridWidth / 2 ? " right-12" : " left-12") +
-                          (selectedModal.column === cellIndex && selectedModal.row === rowIndex ? " visible transition ease-in-out delay-0 bg-blue-500 -translate-y-1 scale-110 duration-200" : " ")
+                          (cellIndex > gridWidth / 2
+                            ? " right-12"
+                            : " left-12") +
+                          (selectedModal.column === cellIndex &&
+                          selectedModal.row === rowIndex
+                            ? " visible -translate-y-1 scale-110 bg-blue-500 transition delay-0 duration-200 ease-in-out"
+                            : " ")
                         }
                         id={cell.id}
                       >
                         <div className="flex flex-col gap-2 text-sm">
-                          <button
-                            className="rounded-2xl bg-yellow-400 px-3 py-2 font-bold text-white hover:bg-yellow-600"
-                            onClick={() => {
-                              console.log("cell", cell);
-                              void router.push(`/manage/${cell.id}`);
-                            }}
-                          >
-                            {"Actualizar " + cell.name}
-                          </button>
-                          <button
-                            className="rounded-2xl bg-red-400 px-3 py-2 font-bold text-white hover:bg-red-700"
-                            onClick={() => {
-                              void handleDeleteCelda(cell);
-                              const dialog = document.getElementById(
-                                cell.id
-                              ) as HTMLDialogElement;
-                              if (dialog) {
-                                dialog.close();
-                              }
-                            }}
-                          >
-                            Borrar Celda
-                          </button>
-                          <button
-                            className="rounded-2xl bg-blue-400 px-3 py-2 font-bold text-white hover:bg-blue-700"
-                            onClick={() => {
-                              setSelectedCell(cell);
-                              const dialog = document.getElementById(
-                                cell.id
-                              ) as HTMLDialogElement;
-                              if (dialog) {
-                                dialog.close();
-                              }
-                            }}
-                          >
-                            Mover Celda
-                          </button>
-
+                          {sessionData?.user.role === "ADMIN" ? (
+                            <div className="flex flex-col gap-2">
+                              <button
+                                className="rounded-2xl bg-yellow-400 px-3 py-2 font-bold text-white hover:bg-yellow-600"
+                                onClick={() => {
+                                  console.log("cell", cell);
+                                  void router.push(`/manage/${cell.id}`);
+                                }}
+                              >
+                                {"Actualizar " + cell.name}
+                              </button>
+                              <button
+                                className="rounded-2xl bg-red-400 px-3 py-2 font-bold text-white hover:bg-red-700"
+                                onClick={() => {
+                                  void handleDeleteCelda(cell);
+                                  const dialog = document.getElementById(
+                                    cell.id
+                                  ) as HTMLDialogElement;
+                                  if (dialog) {
+                                    dialog.close();
+                                  }
+                                }}
+                              >
+                                Borrar Celda
+                              </button>
+                              <button
+                                className="rounded-2xl bg-blue-400 px-3 py-2 font-bold text-white hover:bg-blue-700"
+                                onClick={() => {
+                                  setSelectedCell(cell);
+                                  const dialog = document.getElementById(
+                                    cell.id
+                                  ) as HTMLDialogElement;
+                                  if (dialog) {
+                                    dialog.close();
+                                  }
+                                }}
+                              >
+                                Mover Celda
+                              </button>
+                            </div>
+                          ) : null}
                           <button
                             className="rounded-2xl bg-green-400 px-3 py-2 font-bold text-white hover:bg-green-700"
                             onClick={() => {
@@ -254,32 +272,34 @@ const Grid: NextPage = () => {
                       </dialog>
                     </div>
                   </div>
-                ) : selectedCell.name === "" ? (
-                  <button
-                    className="invisible rounded-full bg-blue-400 px-3 py-1 font-bold text-white hover:bg-blue-700 group-hover:visible group-hover:transition group-hover:ease-in-out group-hover:delay-10 group-hover:scale-125 group-hover:duration-150"
-                    onClick={() => {
-                      void handleCreateCelda(rowIndex, cellIndex);
-                    }}
-                  >
-                    +
-                  </button>
-                ) : (
-                  <button
-                    className="rounded-full bg-green-400 px-3 py-1 font-bold text-white hover:bg-green-700"
-                    onClick={() => {
-                      void handleUpdateCelda(
-                        selectedCell.name,
-                        rowIndex,
-                        cellIndex,
-                        selectedCell.id,
-                        selectedCell.row,
-                        selectedCell.column
-                      );
-                    }}
-                  >
-                    *
-                  </button>
-                )}
+                ) : sessionData?.user.role === "ADMIN" ? (
+                  selectedCell.name === "" ? (
+                    <button
+                      className="group-hover:delay-10 invisible rounded-full bg-blue-400 px-3 py-1 font-bold text-white hover:bg-blue-700 group-hover:visible group-hover:scale-125 group-hover:transition group-hover:duration-150 group-hover:ease-in-out"
+                      onClick={() => {
+                        void handleCreateCelda(rowIndex, cellIndex);
+                      }}
+                    >
+                      +
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full bg-green-400 px-3 py-1 font-bold text-white hover:bg-green-700"
+                      onClick={() => {
+                        void handleUpdateCelda(
+                          selectedCell.name,
+                          rowIndex,
+                          cellIndex,
+                          selectedCell.id,
+                          selectedCell.row,
+                          selectedCell.column
+                        );
+                      }}
+                    >
+                      *
+                    </button>
+                  )
+                ) : null}
               </div>
             ))}
           </div>
