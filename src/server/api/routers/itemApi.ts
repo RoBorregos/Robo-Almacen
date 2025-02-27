@@ -27,7 +27,7 @@ export const itemRouter = createTRPCRouter({
         name: z.string(),
         description: z.string(),
         category: z.string(),
-        department: z.string(),
+        imgPath: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {
@@ -36,7 +36,7 @@ export const itemRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           category: input.category,
-          department: input.department,
+          imgPath: input.imgPath,
         },
       });
     }),
@@ -49,7 +49,6 @@ export const itemRouter = createTRPCRouter({
         name: z.string(),
         description: z.string(),
         category: z.string(),
-        department: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {
@@ -61,7 +60,6 @@ export const itemRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           category: input.category,
-          department: input.department,
         },
       });
     }),

@@ -1,10 +1,13 @@
+"use client";
+
 import { type NextPage } from "next";
 import Layout from "rbgs/components/layout/Layout";
 import { api } from "rbgs/utils/api";
 import { Formik, Form, Field } from "formik";
 import { z } from "zod";
-// import Link from "next/link";
 import { useRouter } from "next/router";
+import { UploadButton } from "rbgs/utils/uploadthing";
+import { useState } from "react";
 
 const Items: NextPage = () => {
   const utils = api.useContext();
@@ -14,11 +17,13 @@ const Items: NextPage = () => {
   const { mutateAsync: mutateAsyncItem } = api.item.create.useMutation();
   const { mutateAsync: mutateAsyncItemDelete } = api.item.delete.useMutation();
 
+  const [imageUrl, setImageUrl] = useState<string>("");
+
   const handleCrearItem = async (data: {
     name: string;
     description: string;
     category: string;
-    department: string;
+    imgPath: string;
   }) => {
     await mutateAsyncItem(data);
     await utils.item.getAll.invalidate();
@@ -31,32 +36,31 @@ const Items: NextPage = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col items-center justify-center gap-4">
+      <div className="my-10 flex flex-col items-center justify-center gap-4">
         <h1 className="text-center text-4xl font-bold text-white">Items</h1>
         <Formik
           initialValues={{
             name: "",
             description: "",
             category: "",
-            department: "",
+            imgPath: "",
           }}
           onSubmit={(values, { setSubmitting }) => {
             void handleCrearItem({
               name: values.name,
               description: values.description,
               category: values.category,
-              department: values.department,
+              imgPath: imageUrl,
             });
             setSubmitting(false);
           }}
           validate={(values) => {
-            // const errors = z.string().nonempty().safeParse(values.name);
             const errors = z
               .object({
-                name: z.string().nonempty(),
-                description: z.string().nonempty(),
-                category: z.string().nonempty(),
-                department: z.string().nonempty(),
+                name: z.string().min(1),
+                description: z.string(),
+                category: z.string().min(1),
+                imgPath: z.string(),
               })
               .safeParse(values);
 
@@ -64,7 +68,7 @@ const Items: NextPage = () => {
           }}
         >
           {({ isSubmitting }) => (
-            <Form className="flex flex-row items-center justify-center gap-4">
+            <Form className="mb-10 flex flex-row items-center justify-center gap-4">
               <div className="flex flex-col items-center justify-center gap-4">
                 <Field
                   className="rounded-md bg-white/10 px-4 py-2 text-white"
@@ -79,17 +83,49 @@ const Items: NextPage = () => {
                   placeholder="Descripción"
                 />
                 <Field
-                  className="rounded-md bg-white/10 px-4 py-2 text-white"
-                  type="text"
+                  as="select"
+                  className="cursor-pointer appearance-none rounded-md bg-white/10 px-4 py-2 text-white"
                   name="category"
-                  placeholder="Categoría"
+                  style={{
+                    WebkitAppearance: "menulist",
+                    MozAppearance: "menulist",
+                  }}
+                >
+                  <option value="" disabled>
+                    Seleccionar categoría
+                  </option>
+                  <option value="hardware" className="bg-gray-800">
+                    Hardware
+                  </option>
+                  <option value="tools" className="bg-gray-800">
+                    Tools
+                  </option>
+                  <option value="components" className="bg-gray-800">
+                    Components
+                  </option>
+                </Field>
+                <UploadButton
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res) => {
+                    const uploadedUrl = res[0]?.ufsUrl ?? "";
+                    console.log(
+                      "Upload completed. URL from response:",
+                      uploadedUrl
+                    );
+                    setImageUrl(uploadedUrl);
+                  }}
+                  onUploadError={(error: Error) => {
+                    // Do something with the error.
+                    alert(`ERROR! ${error.message}`);
+                  }}
                 />
-                <Field
-                  className="rounded-md bg-white/10 px-4 py-2 text-white"
-                  type="text"
-                  name="department"
-                  placeholder="Departamento"
-                />
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt="Imagen del item"
+                    className="max-h-80"
+                  />
+                )}
               </div>
 
               <button
@@ -102,6 +138,7 @@ const Items: NextPage = () => {
             </Form>
           )}
         </Formik>
+
         {isLoadingItems ? (
           <p className="text-center text-2xl font-bold text-white">
             Cargando...

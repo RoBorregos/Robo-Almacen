@@ -45,11 +45,6 @@ export const prestamosRouter = createTRPCRouter({
                           contains: input.search,
                         },
                       },
-                      {
-                        department: {
-                          contains: input.search,
-                        },
-                      },
                     ],
                   },
                 },
@@ -116,11 +111,6 @@ export const prestamosRouter = createTRPCRouter({
                       },
                       {
                         category: {
-                          contains: input.search,
-                        },
-                      },
-                      {
-                        department: {
                           contains: input.search,
                         },
                       },
@@ -193,7 +183,7 @@ export const prestamosRouter = createTRPCRouter({
       const celda = await ctx.prisma.celda.findUnique({
         where: {
           id: input.celdaId,
-        }
+        },
       });
 
       if (!celda) {
@@ -334,7 +324,7 @@ export const prestamosRouter = createTRPCRouter({
       return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
 
-    issuePrestamo: protectedProcedure
+  issuePrestamo: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -353,5 +343,3 @@ export const prestamosRouter = createTRPCRouter({
       return "Préstamo emitido.";
     }),
 });
-
-

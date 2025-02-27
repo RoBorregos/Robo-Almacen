@@ -41,10 +41,6 @@ const ItemCard = ({ item }: { item: Item | null | undefined }) => {
             {" "}
             <b>Categoría:</b> {item?.category}{" "}
           </li>
-          <li>
-            {" "}
-            <b>Departamento:</b> {item?.department}{" "}
-          </li>
           <br />
           <li>
             <b>Cantidad total de artículo:</b> {itemsTotal}

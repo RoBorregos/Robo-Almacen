@@ -11,7 +11,7 @@ const Items: NextPage = () => {
   const router = useRouter();
 
   const { data: item, isLoading: isLoadingItem } = api.item.getOne.useQuery({
-    id: router.query.id as string ?? "",
+    id: (router.query.id as string) ?? "",
   });
   const { mutateAsync: mutateAsyncItem } = api.item.update.useMutation();
 
@@ -19,12 +19,11 @@ const Items: NextPage = () => {
     name: string;
     description: string;
     category: string;
-    department: string;
   }) => {
     console.log(router.query.id, data);
     await mutateAsyncItem({ id: router.query.id as string, ...data });
     await utils.item.getAll.invalidate();
-    await router.push("/manage/items")
+    await router.push("/manage/items");
   };
 
   return isLoadingItem || !item ? (
@@ -38,20 +37,20 @@ const Items: NextPage = () => {
   ) : (
     <Layout>
       <div className="flex flex-col items-center justify-center gap-4">
-        <h1 className="text-center text-4xl font-bold text-white">Actualizar {item.name}</h1>
+        <h1 className="text-center text-4xl font-bold text-white">
+          Actualizar {item.name}
+        </h1>
         <Formik
           initialValues={{
             name: item.name,
             description: item.description,
             category: item.category,
-            department: item.department,
           }}
           onSubmit={(values, { setSubmitting }) => {
             void handleUpdateItem({
               name: values.name,
               description: values.description,
               category: values.category,
-              department: values.department,
             });
             setSubmitting(false);
           }}
@@ -85,17 +84,27 @@ const Items: NextPage = () => {
                   placeholder="Descripción"
                 />
                 <Field
-                  className="rounded-md bg-white/10 px-4 py-2 text-white"
-                  type="text"
+                  as="select"
+                  className="cursor-pointer appearance-none rounded-md bg-white/10 px-4 py-2 text-white"
                   name="category"
-                  placeholder="Categoría"
-                />
-                <Field
-                  className="rounded-md bg-white/10 px-4 py-2 text-white"
-                  type="text"
-                  name="department"
-                  placeholder="Departamento"
-                />
+                  style={{
+                    WebkitAppearance: "menulist",
+                    MozAppearance: "menulist",
+                  }}
+                >
+                  <option value="" disabled>
+                    Seleccionar categoría
+                  </option>
+                  <option value="hardware" className="bg-gray-800">
+                    Hardware
+                  </option>
+                  <option value="tools" className="bg-gray-800">
+                    Tools
+                  </option>
+                  <option value="components" className="bg-gray-800">
+                    Components
+                  </option>
+                </Field>
               </div>
 
               <button

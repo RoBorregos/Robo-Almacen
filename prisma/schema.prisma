@@ -98,7 +98,6 @@ model Item {
   name        String
   description String
   category    String
-  department  String
   imgPath     String      @default("")
   CeldaItem   CeldaItem[]
   Prestamo    Prestamo[]

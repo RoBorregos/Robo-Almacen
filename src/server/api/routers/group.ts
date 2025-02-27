@@ -56,4 +56,34 @@ export const groupRouter = createTRPCRouter({
         include: { user: true },
       });
     }),
+
+  assignCeldaToGroup: adminProcedure
+    .input(z.object({ groupId: z.string(), celdaId: z.string() }))
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.celdaGroup.create({
+        data: { groupId: input.groupId, celdaId: input.celdaId },
+      });
+    }),
+
+  removeCeldaFromGroup: adminProcedure
+    .input(z.object({ groupId: z.string(), celdaId: z.string() }))
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.celdaGroup.delete({
+        where: {
+          celdaId_groupId: {
+            groupId: input.groupId,
+            celdaId: input.celdaId,
+          },
+        },
+      });
+    }),
+
+  getCeldasInGroup: publicProcedure
+    .input(z.object({ groupId: z.string() }))
+    .query(({ input, ctx }) => {
+      return ctx.prisma.celdaGroup.findMany({
+        where: { groupId: input.groupId },
+        include: { celda: true },
+      });
+    }),
 });
