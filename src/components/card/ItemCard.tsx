@@ -10,7 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../../r/components/ui/dialog"
+  DialogClose,
+  DialogFooter,
+} from "../../../r/components/ui/dialog";
 
 // Item Card must contain:
 // Buttons to edit order amount
@@ -20,10 +22,10 @@ import {
 
 export const ItemCard = ({
   id,
-  className,
+  className = "",
 }: {
   id: string;
-  className?: string;
+  className: string;
 }) => {
   const [amount, setAmount] = useState(1);
   const [description, setDescription] = useState("");
@@ -38,6 +40,11 @@ export const ItemCard = ({
   const { data: availableCount } = api.items.getMaxLockerItemCount.useQuery({
     id: id,
   });
+
+  const { data: totalAvailableCount } =
+    api.items.getItemAvailableCount.useQuery({
+      id: id,
+    });
 
   const { data: celdasWithItem } = api.celda.getCeldasWithItemId.useQuery({
     itemId: id,
@@ -55,7 +62,7 @@ export const ItemCard = ({
         draggable: true,
         progress: undefined,
         theme: "light",
-        });
+      });
       void context.items.getItemCounts.invalidate();
     },
     onError: (error) => {
@@ -68,7 +75,7 @@ export const ItemCard = ({
         draggable: true,
         progress: undefined,
         theme: "light",
-        });
+      });
     },
   });
 
@@ -83,11 +90,15 @@ export const ItemCard = ({
   } else if (item) {
     return (
       <VerticalGeneralCard
-        className={className + " border-0 shadow-black shadow-xl cursor-default"}
+        className={
+          className + " cursor-default border-0 shadow-xl shadow-black"
+        }
         title={
           item.name +
           " - (" +
-          (availableCount !== undefined ? availableCount.toString() : "cargando...") +
+          (totalAvailableCount !== undefined
+            ? totalAvailableCount.toString()
+            : "cargando...") +
           " disponibles)"
         }
         imageLink={item.imgPath}
@@ -95,7 +106,9 @@ export const ItemCard = ({
         <div className="flex flex-col">
           <div className="mb-2 flex h-fit w-full flex-row justify-around align-middle">
             <AiOutlineMinusCircle
-              className={`text-black duration-300 transition ${amount === 1 ? "opacity-50" : "cursor-pointer hover:scale-110"}`}
+              className={`text-black transition duration-300 ${
+                amount === 1 ? "opacity-50" : "cursor-pointer hover:scale-110"
+              }`}
               size={30}
               color="#1D4ED8"
               onClick={() => {
@@ -106,7 +119,11 @@ export const ItemCard = ({
             <p className="text-4xl text-black">{amount}</p>
 
             <AiOutlinePlusCircle
-              className={`text-black duration-300 transition ${amount === (availableCount ?? 0) ? "opacity-50" : "cursor-pointer hover:scale-110"}`}
+              className={`text-black transition duration-300 ${
+                amount === (availableCount ?? 0)
+                  ? "opacity-50"
+                  : "cursor-pointer hover:scale-110"
+              }`}
               size={30}
               color="#1D4ED8"
               onClick={() => {
@@ -116,42 +133,49 @@ export const ItemCard = ({
             />
           </div>
           <input
-            className="mb-2 rounded-md bg-slate-900 p-2 text-md"
+            className="text-md mb-2 rounded-md bg-slate-900 p-2"
             placeholder="Descripción del pedido (opcional)"
             onChange={(e) => {
               setDescription(e.target.value);
             }}
           />
+
           <Dialog>
             <DialogTrigger asChild>
-              <button className="w-full rounded-lg transition duration-300 hover:bg-blue-800 bg-blue-700 p-2 text-white mt-3">
+              <button className="mt-3 w-full rounded-lg bg-blue-700 p-2 text-white transition duration-300 hover:bg-blue-800">
                 Pedir {amount} {item.name}
               </button>
             </DialogTrigger>
-            <DialogContent className="fixed inset-0 flex items-center justify-center bg-transparent z-10">
-              <div className="fixed inset-0 bg-black opacity-50 -z-10" />
-              <div className="bg-white p-10 rounded-lg shadow-lg w-fit">
+            <DialogContent className="fixed inset-0 z-10 flex items-center justify-center bg-transparent">
+              <div className="fixed inset-0 -z-10 bg-black opacity-50" />
+              <div className="w-fit rounded-lg bg-white p-10 shadow-lg">
                 <DialogHeader>
-                  <DialogTitle className="w-full text-center mb-3 text-lg font-mono">Casilleros disponibles</DialogTitle>
+                  <DialogTitle className="mb-3 w-full text-center font-mono text-lg">
+                    Casilleros disponibles
+                  </DialogTitle>
                   <DialogDescription>
                     <div className="grid grid-cols-2 gap-3 font-mono">
-                      {celdasWithItem?.map((celdaItem) => (
-                        celdaItem.quantity >= amount && (
-                          <button
-                            key={celdaItem.id}
-                            onClick={() =>
-                              createPrestamo.mutate({
-                                id: id,
-                                quantity: amount,
-                                description: description,
-                                celdaId: celdaItem.Celda.id,
-                                celdaItemId: celdaItem.id,
-                              })}
-                            className="rounded-lg bg-black p-2 text-white w-24 transition duration-300 hover:bg-blue-700">
-                            {celdaItem.Celda.name}
-                          </button>
-                        )
-                      ))}
+                      {celdasWithItem?.map(
+                        (celdaItem) =>
+                          celdaItem.quantity >= amount && (
+                            <button
+                              key={celdaItem.id}
+                              onClick={() => {
+                                console.log("Clicked on celda", celdaItem);
+                                createPrestamo.mutate({
+                                  id: id,
+                                  quantity: amount,
+                                  description: description,
+                                  celdaId: celdaItem.Celda.id,
+                                  celdaItemId: celdaItem.id,
+                                });
+                              }}
+                              className="z-10 w-24 rounded-lg bg-black p-2 text-white transition duration-300 hover:bg-blue-700"
+                            >
+                              {celdaItem.Celda.name}
+                            </button>
+                          )
+                      )}
                     </div>
                   </DialogDescription>
                 </DialogHeader>
