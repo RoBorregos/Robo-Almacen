@@ -207,7 +207,7 @@ export const itemsRouter = createTRPCRouter({
       return await getItemCount(input.id, ctx.prisma);
     }),
 
-    getMaxLockerItemCount: protectedProcedure
+  getMaxLockerItemCount: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       const allRelatedItems = await ctx.prisma.celdaItem.findMany({
@@ -226,6 +226,62 @@ export const itemsRouter = createTRPCRouter({
       });
 
       return maxCount;
+    }),
+
+  getItemsInUsersGroup: protectedProcedure
+    .input(z.object({ search: z.string(), userId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const userId = input.userId;
+
+      // Fetch groups the user belongs to
+      const userGroups = await ctx.prisma.userGroup.findMany({
+        where: { userId },
+        select: { groupId: true },
+      });
+
+      const groupIds = userGroups.map((g) => g.groupId);
+
+      // Fetch celdas that belong to these groups
+      const celdasInGroups = await ctx.prisma.celdaGroup.findMany({
+        where: {
+          groupId: { in: groupIds },
+        },
+        select: { celdaId: true },
+      });
+
+      const celdaIds = celdasInGroups.map((cg) => cg.celdaId);
+
+      // Fetch available items in those celdas
+      const items = await ctx.prisma.item.findMany({
+        where: {
+          AND: [
+            {
+              OR: [
+                { name: { contains: input.search } },
+                { description: { contains: input.search } },
+                { category: { contains: input.search } },
+                { department: { contains: input.search } },
+              ],
+            },
+            {
+              CeldaItem: {
+                some: { celdaId: { in: celdaIds } },
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      // Filter out items that are out of stock
+      const asyncRes = await asyncFilter(items, async (item) => {
+        const count = await getItemCount(item.id, ctx.prisma);
+        return count > 0;
+      });
+
+      return asyncRes;
     }),
 });
 
@@ -254,7 +310,10 @@ const getItemCount = async (
   return availableCount;
 };
 
-const asyncFilter = async (arr: { id: string }[], predicate: (obj: { id: string }) => Promise<boolean>) => {
+const asyncFilter = async (
+  arr: { id: string }[],
+  predicate: (obj: { id: string }) => Promise<boolean>
+) => {
   const results = await Promise.all(arr.map(predicate));
 
   return arr.filter((_v, index) => results[index]);
