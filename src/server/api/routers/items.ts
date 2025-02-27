@@ -206,6 +206,27 @@ export const itemsRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       return await getItemCount(input.id, ctx.prisma);
     }),
+
+    getMaxLockerItemCount: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const allRelatedItems = await ctx.prisma.celdaItem.findMany({
+        where: {
+          itemId: input.id,
+        },
+        select: {
+          quantity: true,
+        },
+      });
+
+      let maxCount = 0;
+
+      allRelatedItems?.forEach((item) => {
+        maxCount = maxCount < item.quantity ? item.quantity : maxCount;
+      });
+
+      return maxCount;
+    }),
 });
 
 const getItemCount = async (

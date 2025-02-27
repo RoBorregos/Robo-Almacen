@@ -1,11 +1,12 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["jsonProtocol"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = "mysql://root:@localhost:3306/AlmacenLocal"
+  // provider = "postgresql"
+  // url      = env("DATABASE_URL")
 }
 
 model Example {
@@ -52,10 +53,11 @@ model User {
   role          String    @default("USER")
   RFID          String?   @unique
 
-  accounts Account[]
-  Prestamo Prestamo[]
-  sessions Session[]
-  UserData UserData?
+  accounts  Account[]
+  Prestamo  Prestamo[]
+  sessions  Session[]
+  UserData  UserData?
+  UserGroup UserGroup[]
 }
 
 model VerificationToken {
@@ -67,13 +69,15 @@ model VerificationToken {
 }
 
 model Celda {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  name      String
-  row       Int
-  column    Int
-  CeldaItem CeldaItem[]
+  id         String       @id @default(cuid())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  name       String
+  row        Int
+  column     Int
+  CeldaItem  CeldaItem[]
+  Prestamo   Prestamo[]
+  CeldaGroup CeldaGroup[]
 }
 
 model CeldaItem {
@@ -109,10 +113,13 @@ model Prestamo {
   quantity    Int
   userId      String
   returned    Boolean   @default(false)
+  issued      Boolean   @default(false)
   itemId      String
   description String    @default("")
+  celdaId     String
   Item        Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
   User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Celda       Celda     @relation(fields: [celdaId], references: [id], onDelete: Cascade)
 }
 
 model Telemetry {
@@ -142,4 +149,29 @@ model UserData {
   image    String?
   semester Int?
   User     User    @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Group {
+  id         String       @id @default(cuid())
+  name       String       @unique
+  users      UserGroup[]
+  CeldaGroup CeldaGroup[]
+}
+
+model UserGroup {
+  userId  String
+  groupId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId]) // Composite primary key
+}
+
+model CeldaGroup {
+  celdaId String
+  groupId String
+  celda   Celda  @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([celdaId, groupId]) // Composite primary key
 }

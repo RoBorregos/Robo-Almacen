@@ -121,4 +121,25 @@ export const celdaRouter = createTRPCRouter({
         },
       });
     }),
+
+  getCeldasWithItemId: publicProcedure
+    .input(
+      z.object({
+        itemId: z.string(),
+        amount: z.number(),
+      })
+    )
+    .query(({ input, ctx }) => {
+      return ctx.prisma.celdaItem.findMany({
+        where: {
+          itemId: input.itemId,
+          quantity: {
+            gte: input.amount,
+          },
+        },
+        include: {
+          Celda: true,
+        },
+      });
+    }),
 });

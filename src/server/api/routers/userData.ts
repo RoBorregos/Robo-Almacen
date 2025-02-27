@@ -139,4 +139,8 @@ export const userDataRouter = createTRPCRouter({
         },
       });
     }),
+
+  getAllUsers: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findMany();
+  }),
 });

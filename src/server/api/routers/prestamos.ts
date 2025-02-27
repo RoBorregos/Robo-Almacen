@@ -185,110 +185,53 @@ export const prestamosRouter = createTRPCRouter({
         id: z.string(),
         quantity: z.number(),
         description: z.string(),
+        celdaId: z.string(),
+        celdaItemId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const celdaItem = await ctx.prisma.celdaItem.findMany({
+      const celda = await ctx.prisma.celda.findUnique({
         where: {
-          AND: [
-            {
-              Item: {
-                id: input.id,
-              },
-            },
-            {
-              quantity: {
-                gte: 0,
-              },
-            },
-          ],
-        },
-        orderBy: {
-          quantity: "asc",
-        },
-      });
-
-      if (input.quantity < 1) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "La cantidad debe ser mayor a 0.",
-        });
-      }
-      if (celdaItem.length === 0 && celdaItem != undefined) {
-        throw new TRPCError({
-          code: "PRECONDITION_FAILED",
-          message: "No hay items disponibles.",
-        });
-      }
-
-      // Check if there are enough items available.
-      let availableCount = 0;
-
-      celdaItem.map((item) => {
-        availableCount += item.quantity;
-      });
-
-      if (availableCount < input.quantity) {
-        throw new TRPCError({
-          code: "PRECONDITION_FAILED",
-          message: "No hay suficientes items disponibles.",
-        });
-      }
-
-      let remainingQuantity = input.quantity;
-      const openCells: string[] = [];
-
-      // Update the quantity of the items in the cells.
-      // Use transaction to ensure that all the updates are done or failed.
-      await ctx.prisma.$transaction(async (tx) => {
-        for (let i = 0; i < celdaItem.length && remainingQuantity > 0; i++) {
-          const item = celdaItem[i];
-          if (!item) continue;
-          openCells.push(item.celdaId);
-          if (item.quantity >= remainingQuantity) {
-            await tx.celdaItem.update({
-              where: {
-                id: item.id,
-              },
-              data: {
-                quantity: item.quantity - remainingQuantity,
-              },
-            });
-
-            remainingQuantity = 0;
-          } else {
-            await tx.celdaItem.update({
-              where: {
-                id: item.id,
-              },
-              data: {
-                quantity: 0,
-              },
-            });
-
-            remainingQuantity -= item.quantity;
-          }
+          id: input.celdaId,
         }
+      });
 
-        await tx.prestamo.create({
-          data: {
-            itemId: input.id,
-            description: input.description,
-            quantity: input.quantity,
-            userId: ctx.session.user.id,
-          },
+      if (!celda) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No se encontró la celda.",
         });
-        // Open cells stored in openCells.
-        // open(openCells);
+      }
+
+      await ctx.prisma.celdaItem.update({
+        where: {
+          id: input.celdaItemId,
+        },
+        data: {
+          quantity: {
+            decrement: input.quantity,
+          },
+        },
+      });
+
+      await ctx.prisma.prestamo.create({
+        data: {
+          itemId: input.id,
+          description: input.description,
+          quantity: input.quantity,
+          userId: ctx.session.user.id,
+          celdaId: input.celdaId,
+        },
       });
 
       // TODO: send easy to interpret message to open the cell.
       return (
         "Préstamo creado exitosamente, abra las celda(s): " +
-        openCells.join(", ") +
+        // openCells.join(", ") +
         " para obtener los items."
       );
     }),
+
   returnPrestamo: protectedProcedure
     .input(
       z.object({
@@ -390,4 +333,25 @@ export const prestamosRouter = createTRPCRouter({
       // TODO: send easy to interpret message to open the cell.
       return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
+
+    issuePrestamo: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.prestamo.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          issued: true,
+        },
+      });
+
+      return "Préstamo emitido.";
+    }),
 });
+
+
