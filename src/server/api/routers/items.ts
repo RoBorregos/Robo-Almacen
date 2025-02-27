@@ -5,7 +5,7 @@ import {
   // publicProcedure,
   protectedProcedure,
 } from "rbgs/server/api/trpc";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 export const itemsRouter = createTRPCRouter({
   getAllItems: protectedProcedure.query(({ ctx }) => {
@@ -38,11 +38,6 @@ export const itemsRouter = createTRPCRouter({
             },
             {
               category: {
-                contains: input.search,
-              },
-            },
-            {
-              department: {
                 contains: input.search,
               },
             },
@@ -87,11 +82,6 @@ export const itemsRouter = createTRPCRouter({
                     contains: input.search,
                   },
                 },
-                {
-                  department: {
-                    contains: input.search,
-                  },
-                },
               ],
             },
           ],
@@ -130,11 +120,6 @@ export const itemsRouter = createTRPCRouter({
             },
             {
               category: {
-                contains: input.search,
-              },
-            },
-            {
-              department: {
                 contains: input.search,
               },
             },
@@ -260,7 +245,6 @@ export const itemsRouter = createTRPCRouter({
                 { name: { contains: input.search } },
                 { description: { contains: input.search } },
                 { category: { contains: input.search } },
-                { department: { contains: input.search } },
               ],
             },
             {
@@ -285,14 +269,7 @@ export const itemsRouter = createTRPCRouter({
     }),
 });
 
-const getItemCount = async (
-  id: string,
-  db: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-  >
-) => {
+const getItemCount = async (id: string, db: PrismaClient) => {
   const celdas = await db.celdaItem.findMany({
     where: {
       itemId: id,

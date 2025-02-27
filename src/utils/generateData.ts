@@ -18,7 +18,6 @@ export function generateRandomItem(): Item {
     name: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
     category: faker.commerce.department(),
-    department: faker.commerce.department(),
     imgPath: "fakePath.jpg",
     createdAt: faker.date.past(),
     updatedAt: new Date(),
@@ -38,7 +37,6 @@ export function generateRandomUser(): User {
     image: "none",
     hasData: false,
     role: "USER",
-    RFIDtoken: faker.string.uuid(),
   };
 }
 

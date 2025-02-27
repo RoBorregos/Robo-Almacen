@@ -29,7 +29,6 @@ export const ItemModel = z.object({
   name: z.string(),
   description: z.string(),
   category: z.string(),
-  department: z.string(),
   imgPath: z.string(),
 });
 

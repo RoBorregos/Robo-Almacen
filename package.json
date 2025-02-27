@@ -25,6 +25,7 @@
     "@trpc/next": "^10.18.0",
     "@trpc/react-query": "^10.18.0",
     "@trpc/server": "^10.18.0",
+    "@uploadthing/react": "^7.3.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "formik": "^2.4.4",
@@ -34,11 +35,13 @@
     "next-cloudinary": "^6.6.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-dropzone": "^14.3.8",
     "react-icons": "^4.11.0",
     "react-toastify": "^9.1.3",
     "superjson": "1.12.2",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
+    "uploadthing": "^7.5.2",
     "zod": "^3.21.4"
   },
   "devDependencies": {
