@@ -169,11 +169,11 @@ export const ItemCard = ({
                               celdaItemId: celdaItem.id,
                             });
                           }}
-                          // disabled={amount}
                           variant="outline"
-                          className="w-24 rounded-lg bg-black p-2 text-white transition duration-300 hover:bg-blue-700"
+                          className="rounded-lg bg-black p-2 text-white transition duration-300 hover:bg-blue-700"
                         >
-                          {celdaItem.Celda.name} {}
+                          {celdaItem.Celda.name} ({celdaItem.quantity}{" "}
+                          disponibles)
                         </Button>
                       )
                   )}
