@@ -8,10 +8,12 @@ import { z } from "zod";
 import { useRouter } from "next/router";
 import { UploadButton } from "rbgs/utils/uploadthing";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 const Items: NextPage = () => {
   const utils = api.useContext();
   const router = useRouter();
+  const { status } = useSession();
 
   const { data: items, isLoading: isLoadingItems } = api.item.getAll.useQuery();
   const { mutateAsync: mutateAsyncItem } = api.item.create.useMutation();
@@ -33,6 +35,16 @@ const Items: NextPage = () => {
     await mutateAsyncItemDelete(id);
     await utils.item.getAll.invalidate();
   };
+
+  if (status === "unauthenticated") {
+    return (
+      <Layout>
+        <h1 className="text-4xl font-bold text-white">
+          Inicia sesión para acceder a esta página.
+        </h1>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
