@@ -1,7 +1,7 @@
 import { VerticalGeneralCard } from "./VerticalGeneralCard";
 import { api } from "../../utils/api";
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import {
   Dialog,
@@ -10,8 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
-  DialogFooter,
 } from "../../../r/components/ui/dialog";
 import { Button } from "r/components/ui/button";
 
@@ -26,7 +24,7 @@ export const ItemCard = ({
   className = "",
 }: {
   id: string;
-  className: string;
+  className?: string;
 }) => {
   const [amount, setAmount] = useState(1);
   const [description, setDescription] = useState("");

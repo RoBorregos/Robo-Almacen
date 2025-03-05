@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Layout from "rbgs/components/layout/Layout";

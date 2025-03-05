@@ -1,6 +1,7 @@
 import logo from "./public/Letras.png";
 import { useSession } from "next-auth/react";
 import { signOut, signIn } from "next-auth/react";
+import Link from "next/link";
 
 import { allowedRole } from "rbgs/utils/roles";
 
@@ -51,9 +52,9 @@ const NavBar = ({
             ))}
             {sessionData?.user.role === "ADMIN" && (
               <li className="mr-6 inline-block">
-                <a className={color} href="/admin">
+                <Link className={color} href="/admin">
                   Admin
-                </a>
+                </Link>
               </li>
             )}
           </ul>
@@ -63,7 +64,7 @@ const NavBar = ({
       <div className="flex items-center justify-end">
         <div className="flex justify-center">
           <button
-            onClick={sessionData ? () => signOut() : () => signIn()}
+            onClick={sessionData ? () => void signOut() : () => void signIn()}
             className="font-inter mr-12 rounded-lg border bg-blue-700 px-4 py-1 text-gray-100 transition duration-300 hover:bg-blue-800"
           >
             {sessionData ? "Sign out" : "Sign in"}
