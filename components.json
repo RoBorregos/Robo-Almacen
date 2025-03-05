@@ -7,14 +7,15 @@
     "config": "tailwind.config.ts",
     "css": "src/styles/globals.css",
     "baseColor": "neutral",
-    "cssVariables": false,
+    "cssVariables": true,
     "prefix": ""
   },
   "aliases": {
-    "components": "r/components",
-    "utils": "r/lib/utils",
-    "ui": "r/components/ui",
-    "lib": "r/lib",
-    "hooks": "r/hooks"
-  }
+    "components": "rbgs/components",
+    "utils": "rbgs/lib/utils",
+    "ui": "rbgs/components/ui",
+    "lib": "rbgs/lib",
+    "hooks": "rbgs/hooks"
+  },
+  "iconLibrary": "lucide"
 }

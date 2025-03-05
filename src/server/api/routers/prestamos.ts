@@ -214,12 +214,7 @@ export const prestamosRouter = createTRPCRouter({
         },
       });
 
-      // TODO: send easy to interpret message to open the cell.
-      return (
-        "Préstamo creado exitosamente, abra las celda(s): " +
-        // openCells.join(", ") +
-        " para obtener los items."
-      );
+      return "Préstamo creado exitosamente, abra las celda que seleccionó para obtener el item ";
     }),
 
   returnPrestamo: protectedProcedure
