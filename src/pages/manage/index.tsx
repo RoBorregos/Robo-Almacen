@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 
 const Grid: NextPage = () => {
-  const { data: sessionData } = useSession();
+  const { data: sessionData, status } = useSession();
   // const
 
   const utils = api.useContext();
@@ -82,10 +82,20 @@ const Grid: NextPage = () => {
     });
   }, [celdas]);
 
+  if (status === "unauthenticated") {
+    return (
+      <Layout>
+        <div>Unauthenticated</div>
+      </Layout>
+    );
+  }
+
   if (isLoadingCeldas)
     return (
       <Layout>
-        <div>Loading...</div>
+        <h1 className="text-4xl font-bold text-white">
+          Inicia sesión para acceder a esta página.
+        </h1>
       </Layout>
     );
 
