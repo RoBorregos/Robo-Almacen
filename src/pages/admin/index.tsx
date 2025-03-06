@@ -1,8 +1,10 @@
+/* eslint-disable */
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Layout from "rbgs/components/layout/Layout";
 import { api } from "rbgs/utils/api";
 import { useState } from "react";
+import { AssignUserData } from "rbgs/components/auth/AssignUserData";
 
 const Admin: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -14,6 +16,7 @@ const Admin: NextPage = () => {
   return (
     <Layout>
       <GroupManagement />
+      <AssignUserData />
     </Layout>
   );
 };
