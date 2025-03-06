@@ -18,7 +18,6 @@ export function generateRandomItem(): Item {
     name: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
     category: faker.commerce.department(),
-    department: faker.commerce.department(),
     imgPath: "fakePath.jpg",
     createdAt: faker.date.past(),
     updatedAt: new Date(),
@@ -54,6 +53,8 @@ export function generateRandomPrestamo(): Prestamo {
     itemId: faker.string.uuid(),
     description: faker.commerce.productDescription(),
     userId: faker.string.uuid(),
+    celdaId: faker.string.uuid(),
+    issued: faker.datatype.boolean(),
   };
 }
 

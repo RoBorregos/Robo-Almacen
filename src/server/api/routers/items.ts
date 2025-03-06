@@ -5,7 +5,7 @@ import {
   // publicProcedure,
   protectedProcedure,
 } from "rbgs/server/api/trpc";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 export const itemsRouter = createTRPCRouter({
   getAllItems: protectedProcedure.query(({ ctx }) => {
@@ -38,11 +38,6 @@ export const itemsRouter = createTRPCRouter({
             },
             {
               category: {
-                contains: input.search,
-              },
-            },
-            {
-              department: {
                 contains: input.search,
               },
             },
@@ -87,11 +82,6 @@ export const itemsRouter = createTRPCRouter({
                     contains: input.search,
                   },
                 },
-                {
-                  department: {
-                    contains: input.search,
-                  },
-                },
               ],
             },
           ],
@@ -130,11 +120,6 @@ export const itemsRouter = createTRPCRouter({
             },
             {
               category: {
-                contains: input.search,
-              },
-            },
-            {
-              department: {
                 contains: input.search,
               },
             },
@@ -206,16 +191,85 @@ export const itemsRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       return await getItemCount(input.id, ctx.prisma);
     }),
+
+  getMaxLockerItemCount: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const allRelatedItems = await ctx.prisma.celdaItem.findMany({
+        where: {
+          itemId: input.id,
+        },
+        select: {
+          quantity: true,
+        },
+      });
+
+      let maxCount = 0;
+
+      allRelatedItems?.forEach((item) => {
+        maxCount = maxCount < item.quantity ? item.quantity : maxCount;
+      });
+
+      return maxCount;
+    }),
+
+  getItemsInUsersGroup: protectedProcedure
+    .input(z.object({ search: z.string(), userId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const userId = input.userId;
+
+      // Fetch groups the user belongs to
+      const userGroups = await ctx.prisma.userGroup.findMany({
+        where: { userId },
+        select: { groupId: true },
+      });
+
+      const groupIds = userGroups.map((g) => g.groupId);
+
+      // Fetch celdas that belong to these groups
+      const celdasInGroups = await ctx.prisma.celdaGroup.findMany({
+        where: {
+          groupId: { in: groupIds },
+        },
+        select: { celdaId: true },
+      });
+
+      const celdaIds = celdasInGroups.map((cg) => cg.celdaId);
+
+      // Fetch available items in those celdas
+      const items = await ctx.prisma.item.findMany({
+        where: {
+          AND: [
+            {
+              OR: [
+                { name: { contains: input.search } },
+                { description: { contains: input.search } },
+                { category: { contains: input.search } },
+              ],
+            },
+            {
+              CeldaItem: {
+                some: { celdaId: { in: celdaIds } },
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      // Filter out items that are out of stock
+      const asyncRes = await asyncFilter(items, async (item) => {
+        const count = await getItemCount(item.id, ctx.prisma);
+        return count > 0;
+      });
+
+      return asyncRes;
+    }),
 });
 
-const getItemCount = async (
-  id: string,
-  db: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
-  >
-) => {
+const getItemCount = async (id: string, db: PrismaClient) => {
   const celdas = await db.celdaItem.findMany({
     where: {
       itemId: id,
@@ -233,7 +287,10 @@ const getItemCount = async (
   return availableCount;
 };
 
-const asyncFilter = async (arr: { id: string }[], predicate: (obj: { id: string }) => Promise<boolean>) => {
+const asyncFilter = async (
+  arr: { id: string }[],
+  predicate: (obj: { id: string }) => Promise<boolean>
+) => {
   const results = await Promise.all(arr.map(predicate));
 
   return arr.filter((_v, index) => results[index]);

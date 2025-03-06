@@ -50,6 +50,35 @@ export const PrestamoCard = ({
     },
   });
 
+  const issuePrestamo = api.prestamos.issuePrestamo.useMutation({
+    onSuccess: (message) => {
+      toast.success(message, {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+
+      void context.prestamos.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message, {
+        position: "top-center",
+        autoClose: 10000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <HorizontalGeneralCard>
@@ -81,12 +110,23 @@ export const PrestamoCard = ({
                 <p>Fecha de regreso: {prestamo.finalDate?.toDateString()}</p>
               )}
             </div>
+            {/* BUTTONS JUST FOR TESTING */}
             {!prestamo.returned && (
               <button
                 onClick={() => returnPrestamo.mutate({ id: id })}
                 className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
               >
                 Devolver préstamo
+              </button>
+            )}
+            {!prestamo.issued && (
+              <button
+                onClick={() => 
+                  issuePrestamo.mutate({ id: id })
+                }
+                className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
+              >
+                Issue prestamo
               </button>
             )}
           </div>

@@ -23,7 +23,7 @@ const Layout = ({
           { name: "About", path: "/about" },
           { name: "Celdas", path: "/manage" },
           { name: "Items", path: "/manage/items" },
-          { name: "Users", path: "/manage/users", roles: ["admin"]},
+          { name: "Users", path: "/manage/users", roles: ["admin"] },
         ]}
       />
       <main

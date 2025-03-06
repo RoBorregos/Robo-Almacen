@@ -139,4 +139,36 @@ export const userDataRouter = createTRPCRouter({
         },
       });
     }),
+
+  getAllUsers: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findMany();
+  }),
+
+  getUserOverviews: adminProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        RFID: true,
+      },
+    });
+  }),
+
+  updateUserRFID: adminProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        RFID: z.string(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          RFID: input.RFID,
+        },
+      });
+    }),
 });
