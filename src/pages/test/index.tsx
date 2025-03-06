@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { Button } from "r/components/ui/button";
+import { Button } from "src/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "r/components/ui/dialog";
-import { Input } from "r/components/ui/input";
-import { Label } from "r/components/ui/label";
+} from "src/components/ui/dialog";
+import { Input } from "src/components/ui/input";
+import { Label } from "src/components/ui/label";
 
 const DialogDemo: NextPage = () => {
   return (

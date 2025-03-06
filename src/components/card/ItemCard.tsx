@@ -10,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../../r/components/ui/dialog";
-import { Button } from "r/components/ui/button";
+} from "src/components/ui/dialog";
+import { Button } from "src/components/ui/button";
 
 // Item Card must contain:
 // Buttons to edit order amount
