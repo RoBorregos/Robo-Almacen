@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // provider = "mysql"
+  // url      = "mysql://root:@localhost:3306/AlmacenLocal"
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model Example {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  ext_expires_in    Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  hasData       Boolean   @default(false)
+  role          String    @default("USER")
+  RFID          String?   @unique
+
+  accounts  Account[]
+  Prestamo  Prestamo[]
+  sessions  Session[]
+  UserData  UserData?
+  UserGroup UserGroup[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Celda {
+  id         String       @id @default(cuid())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  name       String
+  row        Int
+  column     Int
+  CeldaItem  CeldaItem[]
+  Prestamo   Prestamo[]
+  CeldaGroup CeldaGroup[]
+}
+
+model CeldaItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  quantity  Int
+  celdaId   String
+  itemId    String
+  Celda     Celda    @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+  Item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Item {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  name        String
+  description String
+  category    String
+  imgPath     String      @default("")
+  CeldaItem   CeldaItem[]
+  Prestamo    Prestamo[]
+}
+
+model Prestamo {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  initialDate DateTime  @default(now())
+  finalDate   DateTime?
+  quantity    Int
+  userId      String
+  returned    Boolean   @default(false)
+  issued      Boolean   @default(false)
+  itemId      String
+  description String    @default("")
+  celdaId     String
+  Item        Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Celda       Celda     @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+}
+
+model Telemetry {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  name      String
+  value     String
+}
+
+model User2 {
+  id       String @id
+  name     String
+  email    String
+  major    String
+  semester String
+  phone    String
+  area     String
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model UserData {
+  id       String  @id
+  major    String?
+  phone    String?
+  area     String?
+  image    String?
+  semester Int?
+  User     User    @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Group {
+  id         String       @id @default(cuid())
+  name       String       @unique
+  users      UserGroup[]
+  CeldaGroup CeldaGroup[]
+}
+
+model UserGroup {
+  userId  String
+  groupId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId]) // Composite primary key
+}
+
+model CeldaGroup {
+  celdaId String
+  groupId String
+  celda   Celda  @relation(fields: [celdaId], references: [id], onDelete: Cascade)
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([celdaId, groupId]) // Composite primary key
+}
