@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import {
   createTRPCRouter,
-  protectedProcedure,
+  localProcedure,
 } from "rbgs/server/api/trpc";
 
 export const lockerRouter = createTRPCRouter({
@@ -11,43 +11,20 @@ export const lockerRouter = createTRPCRouter({
   /*
  *  IN: column and row identifier
  *  OUT: status as http code 
- *  TODO: Has sample code
  */
-  selectOpen: protectedProcedure
+  selectOpen: localProcedure
     .input(
       z.object({
-        id: z.string().nullable(),
-        includeReturned: z.boolean().nullable(),
+        x: z.string(),
+        y: z.string(),
       })
     )
     .query(({ input, ctx }) => {
-      if (input.id === undefined || input.id === null) {
-        return undefined;
-      }
+    // Zod & TRPC should guarantee valid input
+    
+        // Use websocket comms here and return
+        // status code from ESP32 reply
+        return `OK, (${input.x},${input.y})`;
 
-      return ctx.prisma.prestamo.findMany({
-        where: {
-          AND: [
-            {
-              Item: {
-                id: input.id,
-              },
-            },
-
-            input.includeReturned
-              ? {}
-              : {
-                  returned: false,
-                },
-          ],
-        },
-        orderBy: {
-          finalDate: "desc",
-        },
-
-        include: {
-          User: true,
-        },
-      });
     }),
 });
