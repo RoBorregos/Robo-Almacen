@@ -6,13 +6,13 @@ import {
   protectedProcedure,
   memberProcedure,
   adminProcedure,
+  localProcedure,
 } from "rbgs/server/api/trpc";
 export const exampleRouter = createTRPCRouter({
   hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
+    .query(({ ctx }) => {
       return {
-        greeting: `Hello ${input.text}`,
+        greeting: `Hello ${ctx.address}`,
       };
     }),
 
@@ -41,4 +41,10 @@ export const exampleRouter = createTRPCRouter({
   getAdminMessage: adminProcedure.query(({ ctx: _ctx }) => {
     return "you are an admin!";
   }),
+
+  getLocalMessage: localProcedure.query(({ctx: _ctx}) =>
+  {
+	  return "we share the house!";
+  }),
+
 });

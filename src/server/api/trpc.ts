@@ -22,6 +22,7 @@ import { prisma } from "rbgs/server/db";
 
 type CreateContextOptions = {
   session: Session | null;
+  address: String | null;
 };
 
 /**
@@ -38,6 +39,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    address: opts.ip,
   };
 };
 
@@ -52,9 +54,10 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
-
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   return createInnerTRPCContext({
     session,
+    ip
   });
 };
 
@@ -150,6 +153,20 @@ export const memberProcedure = protectedProcedure.use(async ({ ctx, next }) => {
  */
 export const adminProcedure = memberProcedure.use(async ({ ctx, next }) => {
   if (ctx.session.user.role !== "ADMIN") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next({ ctx });
+});
+
+/**
+ * Local procedure
+ *
+ * Only for operations done in the HID device itself
+ * Assuming requests are not being forwarded from itself
+ */
+export const localProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  if ( !ctx.address.includes("127.0.0.1") ) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
