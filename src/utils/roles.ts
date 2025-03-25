@@ -1,5 +1,3 @@
-export type UserRole = "USER" | "MEMBER" | "ADMIN";
-
 export const allowedRole = ({
   role,
   allowed,

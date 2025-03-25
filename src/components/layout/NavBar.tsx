@@ -1,7 +1,5 @@
-import logo from "./public/Letras.png";
 import { useSession } from "next-auth/react";
 import { signOut, signIn } from "next-auth/react";
-import Link from "next/link";
 
 import { allowedRole } from "rbgs/utils/roles";
 
@@ -50,13 +48,6 @@ const NavBar = ({
                 </a>
               </li>
             ))}
-            {sessionData?.user.role === "ADMIN" && (
-              <li className="mr-6 inline-block">
-                <Link className={color} href="/admin">
-                  Admin
-                </Link>
-              </li>
-            )}
           </ul>
         </div>
       </div>

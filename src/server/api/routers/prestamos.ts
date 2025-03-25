@@ -337,4 +337,109 @@ export const prestamosRouter = createTRPCRouter({
 
       return "Préstamo emitido.";
     }),
+
+  // Inactive prestamos are the prestamos waiting to be issued.
+  getInactivePrestamosId: protectedProcedure
+    .input(z.object({ search: z.string() }))
+    .query(({ input, ctx }) => {
+      return ctx.prisma.prestamo.findMany({
+        where: {
+          AND: [
+            {
+              issued: false,
+            },
+            {
+              OR: [
+                {
+                  id: {
+                    contains: input.search,
+                  },
+                },
+                {
+                  Item: {
+                    OR: [
+                      {
+                        name: {
+                          contains: input.search,
+                        },
+                      },
+                      {
+                        description: {
+                          contains: input.search,
+                        },
+                      },
+                      {
+                        category: {
+                          contains: input.search,
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+    }),
+
+  // Active prestamos are the prestamos issued and waiting to be returned.
+  getActivePrestamosId: protectedProcedure
+    .input(z.object({ search: z.string() }))
+    .query(({ input, ctx }) => {
+      return ctx.prisma.prestamo.findMany({
+        where: {
+          AND: [
+            {
+              issued: true,
+            },
+            {
+              returned: false,
+            },
+            {
+              OR: [
+                {
+                  id: {
+                    contains: input.search,
+                  },
+                },
+                {
+                  Item: {
+                    OR: [
+                      {
+                        name: {
+                          contains: input.search,
+                        },
+                      },
+                      {
+                        description: {
+                          contains: input.search,
+                        },
+                      },
+                      {
+                        category: {
+                          contains: input.search,
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+    }),
 });
