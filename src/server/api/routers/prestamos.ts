@@ -338,70 +338,19 @@ export const prestamosRouter = createTRPCRouter({
       return "Préstamo emitido.";
     }),
 
-  // Inactive prestamos are the prestamos waiting to be issued.
-  getInactivePrestamosId: protectedProcedure
-    .input(z.object({ search: z.string() }))
+  // Gets prestamos that are active (waiting to be returned)
+  // If active is true, it should correspond to issued prestamos
+  getActivePrestamosIds: protectedProcedure
+    .input(z.object({ search: z.string(), active: z.boolean() }))
     .query(({ input, ctx }) => {
-      return ctx.prisma.prestamo.findMany({
-        where: {
-          AND: [
-            {
-              issued: false,
-            },
-            {
-              OR: [
-                {
-                  id: {
-                    contains: input.search,
-                  },
-                },
-                {
-                  Item: {
-                    OR: [
-                      {
-                        name: {
-                          contains: input.search,
-                        },
-                      },
-                      {
-                        description: {
-                          contains: input.search,
-                        },
-                      },
-                      {
-                        category: {
-                          contains: input.search,
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          ],
-        },
-        select: {
-          id: true,
-        },
-        orderBy: {
-          createdAt: "asc",
-        },
-      });
-    }),
+      const options = [];
+      options.push({ returned: false });
+      options.push({ issued: input.active });
 
-  // Active prestamos are the prestamos issued and waiting to be returned.
-  getActivePrestamosId: protectedProcedure
-    .input(z.object({ search: z.string() }))
-    .query(({ input, ctx }) => {
       return ctx.prisma.prestamo.findMany({
         where: {
           AND: [
-            {
-              issued: true,
-            },
-            {
-              returned: false,
-            },
+            ...options,
             {
               OR: [
                 {

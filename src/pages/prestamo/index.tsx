@@ -13,7 +13,8 @@ import { Session } from "next-auth";
 const Dashboard: NextPage = () => {
   const { data, status } = useSession();
 
-  const [display, setDisplay] = useState("active-prestamos");
+  const buttons = ["activos", "inactivos"];
+  const [display, setDisplay] = useState(buttons[0] ?? "");
   const [searchText, setSearchText] = useState("");
 
   if (status === "unauthenticated") {
@@ -40,23 +41,17 @@ const Dashboard: NextPage = () => {
     <Layout className="justify-start">
       <div className="mt-3 flex w-full flex-col justify-start">
         <div className="my-5 flex w-full flex-row flex-wrap justify-center space-x-3">
-          <button
-            className={`rounded-md bg-blue-700 px-4 py-2 text-white transition duration-300 hover:bg-blue-800 ${
-              display === "active-prestamos" ? "bg-blue-800" : ""
-            }`}
-            onClick={() => setDisplay("active-prestamos")}
-          >
-            Préstamos activos
-          </button>
-          <button
-            className={`rounded-md bg-blue-700 px-4 py-2 text-white transition duration-300 hover:bg-blue-800 ${
-              display === "inactive-prestamos" ? "bg-blue-800" : ""
-            }`}
-            onClick={() => setDisplay("inactive-prestamos")}
-          >
-            Préstamos inactivos
-          </button>
-
+          {buttons.map((buttonType) => (
+            <button
+              key={buttonType}
+              className={`rounded-md bg-blue-700 px-4 py-2 text-white transition duration-300 hover:bg-blue-800 ${
+                display === buttonType ? "bg-blue-800" : ""
+              }`}
+              onClick={() => setDisplay(buttonType)}
+            >
+              Préstamos {buttonType}
+            </button>
+          ))}
           <div className="w-6/12">
             <SearchBar setUpdateSearch={setSearchText} />
           </div>
@@ -76,30 +71,23 @@ const PageContent = ({
   searchText: string;
   data: Session | null;
 }) => {
-  if (display === "active-prestamos")
-    return <ActivePrestamoContainer search={searchText} />;
-  if (display === "inactive-prestamos")
-    return <InactivePrestamoContainer search={searchText} />;
+  if (display === "activos")
+    return <PrestamoContainer search={searchText} active={true} />;
+  if (display === "inactivos")
+    return <PrestamoContainer search={searchText} active={false} />;
   return <p>Error, invalid display type</p>;
 };
 
-const ActivePrestamoContainer = ({ search }: { search?: string }) => {
-  const { data: prestamoIDs } = api.prestamos.getActivePrestamosId.useQuery({
+const PrestamoContainer = ({
+  search,
+  active,
+}: {
+  search?: string;
+  active: boolean;
+}) => {
+  const { data: prestamoIDs } = api.prestamos.getActivePrestamosIds.useQuery({
     search: search ?? "",
-  });
-
-  return (
-    <CardContainer>
-      {prestamoIDs?.map((prestamo, id) => (
-        <PrestamoCard id={prestamo.id} showUser={true} key={id} />
-      ))}
-    </CardContainer>
-  );
-};
-
-const InactivePrestamoContainer = ({ search }: { search?: string }) => {
-  const { data: prestamoIDs } = api.prestamos.getInactivePrestamosId.useQuery({
-    search: search ?? "",
+    active: active,
   });
 
   return (
