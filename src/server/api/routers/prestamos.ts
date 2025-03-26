@@ -337,4 +337,58 @@ export const prestamosRouter = createTRPCRouter({
 
       return "Préstamo emitido.";
     }),
+
+  // Gets prestamos that are active (waiting to be returned)
+  // If active is true, it should correspond to issued prestamos
+  getActivePrestamosIds: protectedProcedure
+    .input(z.object({ search: z.string(), active: z.boolean() }))
+    .query(({ input, ctx }) => {
+      const options = [];
+      options.push({ returned: false });
+      options.push({ issued: input.active });
+
+      return ctx.prisma.prestamo.findMany({
+        where: {
+          AND: [
+            ...options,
+            {
+              OR: [
+                {
+                  id: {
+                    contains: input.search,
+                  },
+                },
+                {
+                  Item: {
+                    OR: [
+                      {
+                        name: {
+                          contains: input.search,
+                        },
+                      },
+                      {
+                        description: {
+                          contains: input.search,
+                        },
+                      },
+                      {
+                        category: {
+                          contains: input.search,
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+    }),
 });

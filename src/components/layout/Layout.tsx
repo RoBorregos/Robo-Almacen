@@ -20,10 +20,15 @@ const Layout = ({
       <NavBar
         routes={[
           { name: "Home", path: "/" },
-          { name: "About", path: "/about" },
           { name: "Celdas", path: "/manage" },
           { name: "Items", path: "/manage/items" },
-          { name: "Users", path: "/manage/users", roles: ["admin"] },
+          { name: "Users", path: "/manage/users", roles: ["ADMIN"] },
+          { name: "Prestamos", path: "/prestamo", roles: ["RASPI"] },
+          { name: "Admin", path: "/admin", roles: ["ADMIN"] },
+          {
+            name: "About",
+            path: "https://github.com/RoBorregos/Robo-Almacen/blob/main/README.md",
+          },
         ]}
       />
       <main

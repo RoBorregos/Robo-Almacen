@@ -63,7 +63,7 @@ export const ItemCard = ({
         progress: undefined,
         theme: "light",
       });
-      void context.items.getItemCounts.invalidate();
+      void context.items.invalidate();
       setOpen(false); // Close dialog on success
     },
     onError: (error) => {
