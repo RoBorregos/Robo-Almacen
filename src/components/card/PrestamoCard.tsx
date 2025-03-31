@@ -111,7 +111,7 @@ export const PrestamoCard = ({
               )}
             </div>
             {/* BUTTONS JUST FOR TESTING */}
-            {!prestamo.returned && (
+            {!prestamo.returned && prestamo.issued && (
               <button
                 onClick={() => returnPrestamo.mutate({ id: id })}
                 className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
@@ -121,9 +121,7 @@ export const PrestamoCard = ({
             )}
             {!prestamo.issued && (
               <button
-                onClick={() => 
-                  issuePrestamo.mutate({ id: id })
-                }
+                onClick={() => issuePrestamo.mutate({ id: id })}
                 className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
               >
                 Issue prestamo

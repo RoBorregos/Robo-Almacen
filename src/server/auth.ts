@@ -14,7 +14,7 @@ import { env } from "rbgs/env.mjs";
 /**
  * User roles for access control.
  */
-export type UserRole = "USER" | "MEMBER" | "ADMIN";
+export type UserRole = "USER" | "MEMBER" | "ADMIN" | "RASPI";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
