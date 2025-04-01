@@ -1,6 +1,6 @@
 import { HorizontalGeneralCard } from "./HorizontalGeneralCard";
 import { api } from "../../utils/api";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 // Prestamo card must contain:
 // Button to return items
@@ -90,6 +90,7 @@ export const PrestamoCard = ({
   } else if (prestamo) {
     return (
       <>
+        {issuePrestamo.isLoading && toast.loading("Emitiendo préstamo...")}
         <HorizontalGeneralCard
           title={prestamo.Item.name}
           imageLink={prestamo.Item.imgPath}
@@ -113,7 +114,12 @@ export const PrestamoCard = ({
             {/* BUTTONS JUST FOR TESTING */}
             {!prestamo.returned && prestamo.issued && (
               <button
-                onClick={() => returnPrestamo.mutate({ id: id })}
+                onClick={() => {
+                  toast.success("Devolviendo préstamo...", {
+                    autoClose: 10000,
+                  });
+                  returnPrestamo.mutate({ id: id });
+                }}
                 className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
               >
                 Devolver préstamo
@@ -121,7 +127,12 @@ export const PrestamoCard = ({
             )}
             {!prestamo.issued && (
               <button
-                onClick={() => issuePrestamo.mutate({ id: id })}
+                onClick={() => {
+                  issuePrestamo.mutate({ id: id });
+                  toast.success("Emitiendo préstamo...", {
+                    autoClose: 10000,
+                  });
+                }}
                 className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
               >
                 Issue prestamo
