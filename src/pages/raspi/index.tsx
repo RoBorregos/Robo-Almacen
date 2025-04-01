@@ -16,11 +16,13 @@ export default function RFIDPage() {
 
   return (
     <div className="flex flex-col items-center">
-      <button onClick={handleReadRFID} className="btn">
+      <button onClick={() => void handleReadRFID()} className="btn">
         Scan RFID
       </button>
       {token && (
-        <p>Token: {token} - {isValid ? "Valid" : "Invalid"}</p>
+        <p>
+          Token: {token} - {isValid ? "Valid" : "Invalid"}
+        </p>
       )}
     </div>
   );
