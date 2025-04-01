@@ -22,6 +22,7 @@ import { prisma } from "rbgs/server/db";
 
 type CreateContextOptions = {
   session: Session | null;
+  address: string;
 };
 
 /**
@@ -38,6 +39,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    address: opts.address,
   };
 };
 
@@ -52,9 +54,11 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
+  const ip = req.socket.remoteAddress || "none";
 
   return createInnerTRPCContext({
-    session,
+    session: session,
+    address: ip,
   });
 };
 
@@ -150,6 +154,19 @@ export const memberProcedure = protectedProcedure.use(async ({ ctx, next }) => {
  */
 export const adminProcedure = memberProcedure.use(async ({ ctx, next }) => {
   if (ctx.session.user.role !== "ADMIN") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next({ ctx });
+});
+
+/**
+ * Local procedure
+ *
+ * Only for the host machine (id by remote address and any authenticated account) 
+ */
+export const localProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  if ( !ctx.address.includes("127.0.0.1") ) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 

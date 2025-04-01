@@ -6,6 +6,7 @@ import {
   protectedProcedure,
   memberProcedure,
   adminProcedure,
+  localProcedure,
 } from "rbgs/server/api/trpc";
 export const exampleRouter = createTRPCRouter({
   hello: publicProcedure
@@ -30,7 +31,7 @@ export const exampleRouter = createTRPCRouter({
     return ctx.prisma.example.findMany();
   }),
 
-  getSecretMessage: protectedProcedure.query(({ ctx }) => {
+  getSecretMessage: protectedProcedure.query(({ ctx: _ctx }) => {
     return "you can now see this secret message!";
   }),
 
@@ -40,5 +41,15 @@ export const exampleRouter = createTRPCRouter({
 
   getAdminMessage: adminProcedure.query(({ ctx: _ctx }) => {
     return "you are an admin!";
+  }),
+
+  getLocalMessage: localProcedure.query(({ctx: _ctx}) =>
+  {
+	  return "you are the host machine!";
+  }),
+
+  returnAddress: publicProcedure.query(({ ctx: _ctx }) =>
+  {
+    	  return `addr: ${_ctx.address}`;
   }),
 });
