@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { WebSocket } from "ws";
 import { TRPCError } from "@trpc/server";
+import { env } from "rbgs/env.mjs";
 
 import {
     createTRPCRouter,
@@ -35,7 +36,7 @@ export const lockerRouter = createTRPCRouter({
     .query( async ({ input }) => {
 	let response = "";
 	try {
-	    const ws = new WebSocket("wss://echo.websocket.org");
+	    const ws = new WebSocket(env.WEBSOCKET_URL);
 
 	    // Wait for connection to open
 	    await new Promise<void>((resolve, reject) => {
@@ -44,6 +45,7 @@ export const lockerRouter = createTRPCRouter({
 	    });
 
 	    // TODO: Define response JSON object and parse it here
+	    // Note: Welcome message (if any) is not being skipped
 	    // Send and wait for response, then parse into object
 	    response = await new Promise<string>((resolve, reject) => {
 		ws.on('message', (data: string) => { resolve( data ); });

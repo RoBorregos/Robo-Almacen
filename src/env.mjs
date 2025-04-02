@@ -26,6 +26,7 @@ export const env = createEnv({
     AZURE_AD_TENANT_ID: z.string(),
     GOOGLE_ID: z.string(),
     GOOGLE_SECRET: z.string(),
+    WEBSOCKET_URL: z.string().url(),
   },
 
   /**
@@ -53,5 +54,6 @@ export const env = createEnv({
     NEXT_PUBLIC_DEFAULT_IMAGE: process.env.NEXT_PUBLIC_DEFAULT_IMAGE,
     GOOGLE_ID: process.env.GOOGLE_ID,
     GOOGLE_SECRET: process.env.GOOGLE_SECRET,
+    WEBSOCKET_URL: process.env.WEBSOCKET_URL,
   },
 });
