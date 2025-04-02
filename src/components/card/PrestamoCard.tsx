@@ -90,7 +90,6 @@ export const PrestamoCard = ({
   } else if (prestamo) {
     return (
       <>
-        {issuePrestamo.isLoading && toast.loading("Emitiendo préstamo...")}
         <HorizontalGeneralCard
           title={prestamo.Item.name}
           imageLink={prestamo.Item.imgPath}
