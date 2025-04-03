@@ -7,6 +7,8 @@ import {
   protectedProcedure,
 } from "rbgs/server/api/trpc";
 
+import { env } from "rbgs/env.mjs";
+
 export const prestamosRouter = createTRPCRouter({
   getPrestamosId: protectedProcedure
     .input(z.object({ search: z.string(), type: z.string() }))
@@ -241,6 +243,34 @@ export const prestamosRouter = createTRPCRouter({
         return "Error: el préstamo ya fue devuelto.";
       }
 
+      // Verify user
+      //  Fetch user rfid
+      const userRfid = await ctx.prisma.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          RFID: true,
+        },
+      });
+
+      // Read from server
+      const rfid = await getRfid();
+
+      if (typeof rfid === "string") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: rfid,
+        });
+      }
+
+      if (rfid.token !== userRfid?.RFID) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "El RFID no coincide con el usuario.",
+        });
+      }
+
       // Check cells that have the item. Return the item to the cell that has the most of the same item
       // and that has space to store the item.
 
@@ -302,8 +332,6 @@ export const prestamosRouter = createTRPCRouter({
             },
           });
         });
-        // Open cell
-        // open(celdaItem.celdaId);
       } else if (!celdaItem && !returnCell) {
         throw new TRPCError({
           code: "CONFLICT",
@@ -315,7 +343,6 @@ export const prestamosRouter = createTRPCRouter({
           message: "Error inesperado.",
         });
       }
-      // TODO: send easy to interpret message to open the cell.
       return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
 
@@ -326,6 +353,31 @@ export const prestamosRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const userRfid = await ctx.prisma.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          RFID: true,
+        },
+      });
+
+      // Read from server
+      const rfid = await getRfid();
+
+      if (typeof rfid === "string") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: rfid,
+        });
+      }
+
+      if (rfid.token !== userRfid?.RFID) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "El RFID no coincide con el usuario.",
+        });
+      }
       await ctx.prisma.prestamo.update({
         where: {
           id: input.id,
@@ -392,3 +444,32 @@ export const prestamosRouter = createTRPCRouter({
       });
     }),
 });
+
+const getRfid = async () => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+
+  try {
+    const response = await fetch(`${env.RFID_SERVER}/read-rfid`, {
+      method: "GET",
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return "No se pudo leer el RFID.";
+    }
+
+    const schema = z.object({
+      token: z.string(),
+    });
+
+    return schema.parse(await response.json());
+  } catch (error) {
+    if ((error as Error).name === "AbortError") {
+      return "Timeout al leer el RFID.";
+    }
+    return "Error al leer el RFID.";
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
