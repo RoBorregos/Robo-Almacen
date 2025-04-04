@@ -174,3 +174,8 @@ model CeldaGroup {
 
   @@id([celdaId, groupId]) // Composite primary key
 }
+
+model Connection {
+  connectionId String   @id
+  createdAt    DateTime @default(now())
+}
