@@ -1,6 +1,13 @@
 /* eslint-disable */
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
+import { ApiGatewayManagementApi } from "aws-sdk";
+import { env } from "rbgs/env.mjs";
+
+const apiGateway = new ApiGatewayManagementApi({
+  endpoint: env.WEBSOCKET_URL,
+  region: "us-east-2",
+});
 
 type ResponseData = {
   status: string;
@@ -225,73 +232,106 @@ async function returnPrestamo(data: string) {
   }
 }
 
+async function getConnections() {
+  try {
+    const connections = await prisma.connection.findMany();
+    console.log(connections, "connections");
+    return connections;
+  } catch (error) {
+    console.error("Error fetching connections:", error);
+    throw error;
+  }
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  console.log(req.body, "req");
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ status: "Failed", data: "Method Not Allowed" });
+  }
   const { data, action, id } = req.body;
 
-  switch (id) {
-    case "RFID":
-      console.log("RFID:", action);
-      switch (action) {
-        case "getPrestamos":
-          await getPrestamos()
-            .then((prestamos) => {
-              res.status(200).json({ status: "Success", data: prestamos });
-            })
-            .catch((error) => {
-              res.status(500).json({ status: "Failed", data: error.message });
-            })
-            .finally(async () => {
-              await prisma.$disconnect();
-            });
-          break;
-        case "getIssuedPrestamos":
-          await getIssuedPrestamos()
-            .then((prestamos) => {
-              res.status(200).json({ status: "Success", data: prestamos });
-            })
-            .catch((error) => {
-              res.status(500).json({ status: "Failed", data: error.message });
-            })
-            .finally(async () => {
-              await prisma.$disconnect();
-            });
-          break;
-        case "issuePrestamo":
-          await issuePrestamo(data)
-            .then((message) => {
-              res.status(200).json({ status: "Success", data: message });
-            })
-            .catch((error) => {
-              res.status(400).json({ status: "Failed", data: error.message });
-            })
-            .finally(async () => {
-              await prisma.$disconnect();
-            });
-          break;
-        case "returnPrestamo":
-          await returnPrestamo(data)
-            .then(() => {
-              res
-                .status(200)
-                .json({ status: "Success", data: "Prestamo returned" });
-            })
-            .catch((error) => {
-              res.status(400).json({ status: "Failed", data: error.message });
-            })
-            .finally(async () => {
-              await prisma.$disconnect();
-            });
-          break;
-        default:
-          res.status(400).json({ status: "Failed", data: "Invalid Action" });
-          break;
-      }
-      break;
-    default:
-      res.status(400).json({ status: "Failed", data: "Invalid ID" });
-  }
+  const connections = await getConnections();
+  const sendMessages = connections.map(async ({ connectionId }) => {
+    try {
+      await apiGateway
+        .postToConnection({
+          ConnectionId: connectionId,
+          Data: data,
+        })
+        .promise();
+    } catch (err) {
+      console.error(`Error sending message to ${connectionId}:`, err);
+    }
+  });
+
+  await Promise.all(sendMessages || []);
+
+  res.status(200).json({ status: "Success", data: "Message sent" });
+
+  // switch (id) {
+  //   case "RFID":
+  //     console.log("RFID:", action);
+  //     switch (action) {
+  //       case "getPrestamos":
+  //         await getPrestamos()
+  //           .then((prestamos) => {
+  //             res.status(200).json({ status: "Success", data: prestamos });
+  //           })
+  //           .catch((error) => {
+  //             res.status(500).json({ status: "Failed", data: error.message });
+  //           })
+  //           .finally(async () => {
+  //             await prisma.$disconnect();
+  //           });
+  //         break;
+  //       case "getIssuedPrestamos":
+  //         await getIssuedPrestamos()
+  //           .then((prestamos) => {
+  //             res.status(200).json({ status: "Success", data: prestamos });
+  //           })
+  //           .catch((error) => {
+  //             res.status(500).json({ status: "Failed", data: error.message });
+  //           })
+  //           .finally(async () => {
+  //             await prisma.$disconnect();
+  //           });
+  //         break;
+  //       case "issuePrestamo":
+  //         await issuePrestamo(data)
+  //           .then((message) => {
+  //             res.status(200).json({ status: "Success", data: message });
+  //           })
+  //           .catch((error) => {
+  //             res.status(400).json({ status: "Failed", data: error.message });
+  //           })
+  //           .finally(async () => {
+  //             await prisma.$disconnect();
+  //           });
+  //         break;
+  //       case "returnPrestamo":
+  //         await returnPrestamo(data)
+  //           .then(() => {
+  //             res
+  //               .status(200)
+  //               .json({ status: "Success", data: "Prestamo returned" });
+  //           })
+  //           .catch((error) => {
+  //             res.status(400).json({ status: "Failed", data: error.message });
+  //           })
+  //           .finally(async () => {
+  //             await prisma.$disconnect();
+  //           });
+  //         break;
+  //       default:
+  //         res.status(400).json({ status: "Failed", data: "Invalid Action" });
+  //         break;
+  //     }
+  //     break;
+  //   default:
+  //     res.status(400).json({ status: "Failed", data: "Invalid ID" });
+  // }
 }

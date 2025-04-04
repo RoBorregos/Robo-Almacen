@@ -1,15 +1,31 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from "next";
+import { PrismaClient } from "@prisma/client";
 
-type ResponseData = {
-    message: string
+const prisma = new PrismaClient();
+
+async function saveConnectionId(connectionId: string) {
+  try {
+    await prisma.connection.create({
+      data: {
+        connectionId,
+      },
+    });
+    console.log("Connection ID saved:", connectionId);
+  } catch (error) {
+    console.error("Error saving connection ID:", error);
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
-export default function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<ResponseData>
-    
-) {
-    console.log(req.body, "req")
-    console.log(req.headers, "req")
-    res.status(200).json({ message: 'Connection succeeded!' })
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { connectionId } = req.body;
+
+  if (!connectionId) {
+    return res.status(400).json({ message: "Missing connectionId" });
+  }
+
+  saveConnectionId(connectionId as string);
+
+  res.status(200).json({ message: "Connection succeeded!" });
 }
