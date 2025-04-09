@@ -18,7 +18,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { connectionId } = req.body;
+  const { connectionId } = req.body as { connectionId: string };
 
   if (!connectionId) {
     return res.status(400).json({ message: "Missing connectionId" });

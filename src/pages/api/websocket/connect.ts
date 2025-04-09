@@ -16,14 +16,17 @@ async function saveConnectionId(connectionId: string) {
   }
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { connectionId } = req.body;
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const { connectionId } = req.body as { connectionId: string };
 
   if (!connectionId) {
     return res.status(400).json({ message: "Missing connectionId" });
   }
 
-  saveConnectionId(connectionId as string);
+  await saveConnectionId(connectionId);
 
   res.status(200).json({ message: "Connection succeeded!" });
 }
