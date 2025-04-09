@@ -1,8 +1,8 @@
 /* eslint-disable */
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
 import { ApiGatewayManagementApi } from "aws-sdk";
 import { env } from "rbgs/env.mjs";
+import { prisma } from "rbgs/server/db";
 
 const apiGateway = new ApiGatewayManagementApi({
   endpoint: env.WEBSOCKET_URL,
@@ -13,8 +13,6 @@ type ResponseData = {
   status: string;
   data?: any;
 };
-
-const prisma = new PrismaClient();
 
 async function getPrestamos() {
   try {
