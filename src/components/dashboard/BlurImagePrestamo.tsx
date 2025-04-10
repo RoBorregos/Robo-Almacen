@@ -3,9 +3,8 @@ import { useRouter } from "next/router";
 import { Item } from "@prisma/client";
 import GenButton from "../buttons/GenericButton";
 import { api } from "rbgs/utils/api";
-import { useState } from "react";
-import { env } from "../../env.mjs";
 import { twMerge } from "tailwind-merge";
+import { formatDate } from "rbgs/utils/date";
 
 const displayType: { [key: string]: string } = {
   row: "h-1/3 w-1/3",
@@ -42,9 +41,9 @@ const BlurImagePrestamo = ({
         <h1 className="bg-black/50">
           {prestamo?.finalDate
             ? "Fecha final: " +
-              (prestamo?.finalDate?.toDateString() ?? "Indefinido")
+              (formatDate(prestamo?.finalDate) ?? "Indefinido")
             : "Fecha de inicio: " +
-              (prestamo?.initialDate?.toDateString() ?? "Indefinido")}
+              (formatDate(prestamo?.initialDate) ?? "Indefinido")}
         </h1>
         <h2 className="pl-3 text-left font-bold opacity-0 duration-300 group-hover/item:bg-black/50 group-hover/item:opacity-100">
           {item?.name}, Cantidad: {prestamo?.quantity}

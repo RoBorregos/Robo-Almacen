@@ -17,7 +17,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <Component {...pageProps} />
       <ToastContainer
         position="top-center"
-        autoClose={false}
+        autoClose={5000}
         newestOnTop={false}
         closeOnClick
         rtl={false}

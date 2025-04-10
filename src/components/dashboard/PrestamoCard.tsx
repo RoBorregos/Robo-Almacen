@@ -1,4 +1,5 @@
 import { Prestamo, User } from "@prisma/client";
+import { formatDate } from "rbgs/utils/date";
 
 const PrestamoCard = ({
   prestamo,
@@ -10,7 +11,7 @@ const PrestamoCard = ({
   return (
     <div className="flex flex-row bg-slate-400 text-neutral-800">
       <img
-        className="max-w-56 aspect-square max-h-56"
+        className="aspect-square max-h-56 max-w-56"
         src={"/" + itemData.imgPath}
         alt={itemData.name}
       />
@@ -33,11 +34,11 @@ const PrestamoCard = ({
         </li>
         <li>
           {" "}
-          <b>Fecha de préstamo:</b> {prestamo.createdAt.toDateString()}
+          <b>Fecha de préstamo:</b> {formatDate(prestamo.createdAt)}
         </li>
         <li>
           {" "}
-          <b>Fecha de devolución:</b> {prestamo.finalDate?.toDateString()}
+          <b>Fecha de devolución:</b> {formatDate(prestamo.finalDate)}
         </li>
       </ul>
     </div>
