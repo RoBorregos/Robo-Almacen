@@ -117,7 +117,11 @@ export const PrestamoCard = ({
                   toast.success("Devolviendo préstamo...", {
                     autoClose: 10000,
                   });
-                  returnPrestamo.mutate({ id: id });
+                  returnPrestamo.mutate({
+                    id: id,
+                    x: prestamo.Celda.row,
+                    y: prestamo.Celda.column,
+                  });
                 }}
                 className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
               >
@@ -127,7 +131,11 @@ export const PrestamoCard = ({
             {!prestamo.issued && (
               <button
                 onClick={() => {
-                  issuePrestamo.mutate({ id: id });
+                  issuePrestamo.mutate({
+                    id: id,
+                    x: prestamo.Celda.row,
+                    y: prestamo.Celda.column,
+                  });
                   toast.success("Emitiendo préstamo...", {
                     autoClose: 10000,
                   });

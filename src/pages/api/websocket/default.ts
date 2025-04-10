@@ -250,15 +250,27 @@ export default async function handler(
       .status(405)
       .json({ status: "Failed", data: "Method Not Allowed" });
   }
-  const { data, action, id } = req.body;
+
+  const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+
+  const { connectionId, payload } = req.body as {
+    connectionId: string;
+    payload: { x: number; y: number };
+  };
+
+  console.log(payload);
 
   const connections = await getConnections();
-  const sendMessages = connections.map(async ({ connectionId }) => {
+  const filteredConnections = connections.filter(
+    (connection) => connection.connectionId !== connectionId
+  );
+
+  const sendMessages = filteredConnections.map(async ({ connectionId }) => {
     try {
       await apiGateway
         .postToConnection({
           ConnectionId: connectionId,
-          Data: data,
+          Data: JSON.stringify(payload),
         })
         .promise();
     } catch (err) {
