@@ -1,31 +1,32 @@
 import Image from 'next/image';
-import { MdModeEdit } from "react-icons/md";
-
+import Dropdown from '../layout/Dropdown';
 interface AvatarProps {
     image: string;
-    edit?: boolean;
+    state?: boolean;
+    stateSetter?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ image, edit }) => {
-
+function Avatar({ image, state, stateSetter }: AvatarProps) {
     return (
-        <>
-            {edit && (
-                <div className="rounded-full h-20 w-20 absolute z-40 hover:bg-blue-950/40" />
-            )}
-
-            <div className="relative overflow-hidden rounded-full h-20 w-20 ">
-
-                <Image fill src={image} alt="Avatar" className="object-cover" />
-
+	<>
+	    <div
+		id="avatarMenu"
+		className="relative overflow-hidden rounded-sm h-11 w-11"
+	    >
+                <Image
+		    fill
+		    src={image}
+		    alt="Avatar"
+		    className="object-cover cursor-pointer"
+		    onClick={stateSetter ? () => stateSetter(!state) : () => console.log('No action set.')}
+		/>
             </div>
-
-            {edit && (
-                <div className="relative z-50 left-2 bottom-1">
-                    <MdModeEdit size={20} className="absolute bottom-0 right-0 text-white" />
-                </div>
-            )}
-
+	    <div
+		className={`${state ? "flex" : "hidden"}`}
+		id = "userMenu"
+	    >
+		<Dropdown />
+	    </div>
         </>
     )
 }

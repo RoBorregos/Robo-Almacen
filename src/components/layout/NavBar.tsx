@@ -1,69 +1,80 @@
 import { useSession } from "next-auth/react";
-import { signOut, signIn } from "next-auth/react";
+import { useState, useEffect } from 'react';
+import Image from "next/image";
+import AuthButton from "../auth/AuthButton";
+import Avatar from "../auth/Avatar";
 
 import { allowedRole } from "rbgs/utils/roles";
 
 const color = "text-slate-950 hover:text-sky-800";
 
 const NavBar = ({
-  routes,
+    routes,
 }: {
-  routes: { name: string; path: string; roles?: string[] }[];
-}) => {
-  const { data: sessionData } = useSession();
+	routes: { name: string; path: string; roles?: string[] }[];
+    }) => {
+    const { data: sessionData } = useSession();
 
-  const filteredRoutes = routes.filter((route) => {
-    if (route.roles) {
-      return allowedRole({
-        role: sessionData?.user.role,
-        allowed: route.roles,
-      });
+    const filteredRoutes = routes.filter((route) => {
+	if (route.roles) {
+	    return allowedRole({
+		role: sessionData?.user.role,
+		allowed: route.roles,
+	    });
+	}
+	return true;
+    });
+
+    const [userMenuState, setUserMenuState] = useState(false); // menu state (dropdown)
+
+    function clickHandler(event: MouseEvent)
+    {
+	    const target = event.target as HTMLInputElement;
+	    const dropdown = document.getElementById("userMenu");
+	    const avatarMenu = document.getElementById("avatarMenu")
+	    if(dropdown && !dropdown.classList.contains('hidden') && !avatarMenu!.contains(target)) setUserMenuState(false);
     }
-    return true;
-  });
+    // Hook into document root JS
+    useEffect(() => {
+	document.addEventListener("click", clickHandler);
+    }, []);
 
-  return (
-    <div className="grid h-16 w-full grid-cols-3 justify-evenly px-10 font-mono">
-      {/* Left logos */}
-      <div className="flex items-center justify-center">
-        <img
-          src="/Logo2.svg"
-          alt="Logo"
-          style={{ width: "70px", height: "50px" }}
-        />
-        <img
-          src="/Letras.png"
-          alt="Letras"
-          style={{ width: "180px", height: "30px" }}
-        />
-      </div>
-      {/* Center letters */}
-      <div className="flex items-center justify-center">
-        <div className="mb-0 flex">
-          <ul className="flex items-center">
-            {filteredRoutes.map((route) => (
-              <li className="mr-6 inline-block" key={route.name}>
-                <a className={color} href={route.path}>
-                  {route.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      {/* Right account buttons */}
-      <div className="flex items-center justify-end">
-        <div className="flex justify-center">
-          <button
-            onClick={sessionData ? () => void signOut() : () => void signIn()}
-            className="font-inter mr-12 rounded-lg border bg-blue-700 px-4 py-1 text-gray-100 transition duration-300 hover:bg-blue-800"
-          >
-            {sessionData ? "Sign out" : "Sign in"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    return (
+	<div className="grid h-16 w-full grid-cols-3 justify-evenly px-10 font-mono">
+	    <div className="flex items-center justify-center">
+		<Image
+		    src="/Logo2.svg"
+		    alt="Logo"
+		    width= {70}
+		    height= {50}
+		/>
+		<Image
+		    src="/Letras.png"
+		    alt="Letras"
+		    width= {180}
+		    height= {30}
+		/>
+	    </div>
+	    <div className="flex items-center justify-center">
+		<div className="mb-0 flex">
+		    <ul className="flex items-center">
+			{filteredRoutes.map((route) => (
+			    <li className="mr-6 inline-block" key={route.name}>
+				<a className={color} href={route.path}>
+				    {route.name}
+				</a>
+			    </li>
+			))}
+		    </ul>
+		</div>
+	    </div>
+	    <div className="flex items-center justify-end">
+		<div className="flex justify-center">
+		    {sessionData ? Avatar({image: sessionData.user.image!, state: userMenuState, stateSetter: setUserMenuState}) : AuthButton({})}
+		</div>
+	    </div>
+	</div>
+    );
 };
 
 export default NavBar;
