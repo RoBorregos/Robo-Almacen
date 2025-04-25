@@ -20,7 +20,10 @@ const config = {
   },
 
   images: {
-    domains: ['res.cloudinary.com']
+    remotePatterns: [
+	    { protocol: "https", hostname: "*.googleusercontent.com" },
+	    { protocol: "https", hostname: "res.cloudinary.com" }
+	]
   }
   
 };
