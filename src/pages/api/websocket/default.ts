@@ -251,14 +251,17 @@ export default async function handler(
       .json({ status: "Failed", data: "Method Not Allowed" });
   }
 
-  const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-
   const { connectionId, payload } = req.body as {
     connectionId: string;
     payload: { x: number; y: number };
   };
 
-  console.log(payload);
+  if (!connectionId || !payload || !payload.x || !payload.y) {
+    console.error("Invalid request body:", req.body);
+    return res
+      .status(400)
+      .json({ status: "Failed", data: "Invalid Request Body" });
+  }
 
   const connections = await getConnections();
   const filteredConnections = connections.filter(
