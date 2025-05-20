@@ -274,7 +274,10 @@ export default async function handler(
         })
         .promise();
     } catch (err) {
-      console.error(`Error sending message to ${connectionId}:`, err);
+      res.status(500).json({
+        status: "Failed",
+        data: "Error sending message to connection",
+      });
     }
   });
 
