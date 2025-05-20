@@ -72,7 +72,7 @@ npm run dev
 | Leonardo Llanas    |                                                  |                              |
 | Gilberto Malagamba | [@GilMM27](https://github.com/GilMM27)           | gilberto.malagamba@gmail.com |
 
-## Proyect structure
+## Project structure
 
 ```bash
 ├─ prisma
