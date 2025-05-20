@@ -259,8 +259,7 @@ export const prestamosRouter = createTRPCRouter({
         return "Error: el préstamo ya fue devuelto.";
       }
 
-      // Verify user
-      //  Fetch user rfid
+      // Fetch user rfid
       const userRfid = await ctx.prisma.user.findUnique({
         where: {
           id: ctx.session.user.id,
@@ -360,22 +359,33 @@ export const prestamosRouter = createTRPCRouter({
         });
       }
 
-      const ws = new WebSocket(env.WEBSOCKET_URL);
+      try {
+        const ws = new WebSocket(env.WEBSOCKET_URL);
 
-      // Wait for connection to open
-      await new Promise<void>((resolve, reject) => {
-        ws.once("open", () => {
-          resolve();
+        // Wait for connection to open
+        await new Promise<void>((resolve, reject) => {
+          ws.once("open", () => {
+            resolve();
+          });
+          ws.once("error", () => {
+            reject();
+          });
         });
-        ws.once("error", () => {
-          reject();
-        });
-      });
 
-      // Send x and y in the WebSocket message
-      const message = JSON.stringify({ x: input.x, y: input.y });
-      ws.send(message);
-      ws.close();
+        // Send x and y in the WebSocket message
+        const message = JSON.stringify({ x: input.x, y: input.y });
+        ws.send(message);
+        ws.close();
+
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al conectar con el WebSocket.",
+        });
+      }
+
+      
 
       return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
