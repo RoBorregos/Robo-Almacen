@@ -3,6 +3,7 @@ import { exampleRouter } from "rbgs/server/api/routers/example";
 import { itemsRouter } from "./routers/items";
 import { testsRouter } from "./routers/tests";
 import { prestamosRouter } from "./routers/prestamos";
+import { rfidRouter } from "./routers/rfid";
 import { celdaRouter } from "rbgs/server/api/routers/celdaApi";
 import { itemRouter } from "rbgs/server/api/routers/itemApi";
 import { userDataRouter } from "./routers/userData";
@@ -21,6 +22,7 @@ export const appRouter = createTRPCRouter({
   items: itemsRouter,
   tests: testsRouter,
   group: groupRouter,
+  rfid: rfidRouter,
 });
 
 // export type definition of API
