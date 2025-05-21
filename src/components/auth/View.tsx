@@ -11,13 +11,12 @@ interface ViewProps {
   userId: string;
 }
 
-const View: React.FC<ViewProps> = ({ handleClick, userId }) => {
+const View: React.FC<ViewProps> = ({ userId }) => {
   const { data } = api.userData.getUserData.useQuery({
     id: userId,
   });
 
   const [currentRfid, setCurrentRfid] = useState("");
-  const [lastRead, setLastRead] = useState("");
   const context = api.useUtils();
   const { data: userRfid } = api.userData.getUserRfid.useQuery();
 
@@ -58,7 +57,7 @@ const View: React.FC<ViewProps> = ({ handleClick, userId }) => {
 
   const rfidMutationRead = api.rfid.getRfid.useMutation({
     onSuccess: (data) => {
-      setLastRead(data);
+      setCurrentRfid(data);
       toast.dismiss();
       toast.success(`RFID Read: ${data}`, {
         position: "top-center",
@@ -103,10 +102,10 @@ const View: React.FC<ViewProps> = ({ handleClick, userId }) => {
           </label>
           <div className="flex flex-row gap-2">
             <input
+              disabled
               id="rfid"
               className="w-full rounded-md border p-2 text-black"
               value={currentRfid}
-              onChange={(e) => setCurrentRfid(e.target.value)}
               placeholder="RFID"
             />
             <button
@@ -122,10 +121,6 @@ const View: React.FC<ViewProps> = ({ handleClick, userId }) => {
               Save RFID
             </button>
           </div>
-
-          {lastRead !== "" && (
-            <p className="text-sm text-gray-400">Last RFID Read: {lastRead}</p>
-          )}
         </div>
         {/* <ViewElement label="Major" value={data?.major || ""} />
         <ViewElement label="Semester" value={data?.semester || 0} />
