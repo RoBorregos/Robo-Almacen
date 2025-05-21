@@ -52,7 +52,6 @@ const View: React.FC<ViewProps> = ({ handleClick, userId }) => {
 
   const handleSaveRfid = () => {
     rfidMutation.mutate({
-      userId: userId,
       RFID: currentRfid,
     });
   };

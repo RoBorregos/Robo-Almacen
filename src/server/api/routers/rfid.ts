@@ -9,7 +9,13 @@ export const rfidRouter = createTRPCRouter({
   getRfid: protectedProcedure.mutation(async () => {
     const rfid = await getRfid();
 
-    return typeof rfid === "string" ? rfid : rfid.token;
+    if (typeof rfid === "string") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: rfid,
+      });
+    }
+    return rfid.token;
   }),
 });
 
