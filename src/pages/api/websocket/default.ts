@@ -256,7 +256,7 @@ export default async function handler(
     payload: { x: number; y: number };
   };
 
-  if (!connectionId || !payload || !payload.x || !payload.y) {
+  if (!connectionId || !payload) {
     console.error("Invalid request body:", req.body);
     return res
       .status(400)

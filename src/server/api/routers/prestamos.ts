@@ -376,7 +376,6 @@ export const prestamosRouter = createTRPCRouter({
         const message = JSON.stringify({ x: input.x, y: input.y });
         ws.send(message);
         ws.close();
-
       } catch (error) {
         console.error("Error connecting to WebSocket:", error);
         throw new TRPCError({
@@ -384,8 +383,6 @@ export const prestamosRouter = createTRPCRouter({
           message: "Error al conectar con el WebSocket.",
         });
       }
-
-      
 
       return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
@@ -425,6 +422,31 @@ export const prestamosRouter = createTRPCRouter({
         });
       }
 
+      try {
+        const ws = new WebSocket(env.WEBSOCKET_URL_WSS);
+
+        // Wait for connection to open
+        await new Promise<void>((resolve, reject) => {
+          ws.once("open", () => {
+            resolve();
+          });
+          ws.once("error", () => {
+            reject();
+          });
+        });
+
+        // Send x and y in the WebSocket message
+        const message = JSON.stringify({ x: input.x, y: input.y });
+        ws.send(message);
+        ws.close();
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al conectar con el WebSocket.",
+        });
+      }
+
       await ctx.prisma.prestamo.update({
         where: {
           id: input.id,
@@ -433,23 +455,6 @@ export const prestamosRouter = createTRPCRouter({
           issued: true,
         },
       });
-
-      const ws = new WebSocket(env.WEBSOCKET_URL);
-
-      // Wait for connection to open
-      await new Promise<void>((resolve, reject) => {
-        ws.once("open", () => {
-          resolve();
-        });
-        ws.once("error", () => {
-          reject();
-        });
-      });
-
-      // Send x and y in the WebSocket message
-      const message = JSON.stringify({ x: input.x, y: input.y });
-      ws.send(message);
-      ws.close();
 
       return "Préstamo emitido.";
     }),
