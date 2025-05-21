@@ -7,8 +7,6 @@ import { celdaRouter } from "rbgs/server/api/routers/celdaApi";
 import { itemRouter } from "rbgs/server/api/routers/itemApi";
 import { userDataRouter } from "./routers/userData";
 import { groupRouter } from "./routers/group";
-import { lockerRouter } from "./routers/locker";
-import { rfidRouter } from "./routers/rfid";
 /**
  * This is the primary router for your server.
  *
@@ -23,8 +21,6 @@ export const appRouter = createTRPCRouter({
   items: itemsRouter,
   tests: testsRouter,
   group: groupRouter,
-  locker: lockerRouter,
-  rfid: rfidRouter,
 });
 
 // export type definition of API

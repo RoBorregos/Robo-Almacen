@@ -1,7 +1,7 @@
 import { HorizontalGeneralCard } from "./HorizontalGeneralCard";
 import { api } from "../../utils/api";
 import { toast } from "react-toastify";
-
+import { formatDate } from "../../utils/date";
 // Prestamo card must contain:
 // Button to return items
 // Count of the amount of items
@@ -103,23 +103,37 @@ export const PrestamoCard = ({
                   ? "No hay descripción"
                   : prestamo.description}
               </p>
-              <p>Fecha de préstamo: {prestamo.initialDate.toDateString()}</p>
+              <p>
+                Fecha de préstamo:{" "}
+                {prestamo.initialDate.toLocaleDateString("es-ES", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
               <p>Cantidad: {prestamo.quantity}</p>
               {showUser && <p>Usuario: {prestamo.User.name}</p>}
               {prestamo.returned && prestamo.finalDate && (
-                <p>Fecha de regreso: {prestamo.finalDate?.toDateString()}</p>
+                <p>Fecha de regreso: {formatDate(prestamo.finalDate)}</p>
               )}
             </div>
             {/* BUTTONS JUST FOR TESTING */}
             {!prestamo.returned && prestamo.issued && (
               <button
                 onClick={() => {
-                  toast.success("Devolviendo préstamo...", {
-                    autoClose: 10000,
-                  });
-                  returnPrestamo.mutate({ id: id });
+                  if (!returnPrestamo.isLoading) {
+                    toast.success("Devolviendo préstamo...", {
+                      autoClose: 5000,
+                    });
+                    returnPrestamo.mutate({
+                      id: id,
+                      x: prestamo.Celda.row,
+                      y: prestamo.Celda.column,
+                    });
+                  }
                 }}
-                className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
+                className="ml-auto mr-auto w-fit rounded-lg bg-blue-700 p-2 text-white"
               >
                 Devolver préstamo
               </button>
@@ -127,14 +141,20 @@ export const PrestamoCard = ({
             {!prestamo.issued && (
               <button
                 onClick={() => {
-                  issuePrestamo.mutate({ id: id });
-                  toast.success("Emitiendo préstamo...", {
-                    autoClose: 10000,
-                  });
+                  if (!issuePrestamo.isLoading) {
+                    issuePrestamo.mutate({
+                      id: id,
+                      x: prestamo.Celda.row,
+                      y: prestamo.Celda.column,
+                    });
+                    toast.success("Emitiendo préstamo...", {
+                      autoClose: 10000,
+                    });
+                  }
                 }}
-                className="ml-auto mr-auto w-fit rounded-lg bg-blue-400 p-2 text-black"
+                className="ml-auto mr-auto w-fit rounded-lg bg-blue-700  p-2 text-white"
               >
-                Issue prestamo
+                Issue préstamo
               </button>
             )}
           </div>

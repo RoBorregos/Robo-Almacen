@@ -2,11 +2,11 @@
 
 Website for IoT Wharehouse
 
-# Description
+## Description
 
 Almacén IoT (IoT Wharehouse) is an IoT System for the managment, control and monitoring of the materials in the RoBorregos Lab. It is composed of a web application, a hardware system, and a WebSocket's Server.
 
-# Tech Stack
+## Tech Stack
 
 - [React](https://reactjs.org/)
 - [Next.js](https://nextjs.org/)
@@ -20,7 +20,7 @@ Almacén IoT (IoT Wharehouse) is an IoT System for the managment, control and mo
 - [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
 - [Formik](https://formik.org/)
 
-# Installation
+## Installation
 
 1. Clone the repository
 
@@ -60,7 +60,7 @@ npx prisma db pull
 npm run dev
 ```
 
-# Development Team
+## Development Team
 
 | Name               | Github                                           | Email                        |
 | ------------------ | ------------------------------------------------ | ---------------------------- |
@@ -72,7 +72,7 @@ npm run dev
 | Leonardo Llanas    |                                                  |                              |
 | Gilberto Malagamba | [@GilMM27](https://github.com/GilMM27)           | gilberto.malagamba@gmail.com |
 
-# Proyect structure
+## Project structure
 
 ```bash
 ├─ prisma
@@ -98,7 +98,7 @@ npm run dev
     └─ utils
 ```
 
-# Testing websocket
+## Testing websocket
 
 First, on the root of this project run:
 
@@ -127,7 +127,7 @@ In the following table there are all the examples of actions
 | { "data": "RFIDtoken,prestamoId", "action": "issuePrestamo", "id": "RFID" }  | {"status":"Success","data":"Prestamo issued"}                                                                                                   |
 | { "data": "RFIDtoken,prestamoId", "action": "returnPrestamo", "id": "RFID" } | {"status":"Success","data":"Prestamo returned"}                                                                                                 |
 
-# Testing database
+## Testing database
 
 Run a local instance of mysql or similar provider and add the route to url in the shema.prisma file. _Suggestion: Try using xampp._
 
@@ -147,4 +147,10 @@ To test a new schema.prisma kill _next dev_ and _prisma studio_ and run:
 ```bash
 npx prisma migrate dev
 npx prisma generate
+```
+
+## Forwarding raspi port
+
+```bash
+python3 lib/read.py & ngrok http --url=<add url here> 5000
 ```
