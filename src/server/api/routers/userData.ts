@@ -4,6 +4,7 @@ import {
   createTRPCRouter,
   publicProcedure,
   adminProcedure,
+  protectedProcedure,
 } from "rbgs/server/api/trpc";
 
 export const userDataRouter = createTRPCRouter({
@@ -153,6 +154,18 @@ export const userDataRouter = createTRPCRouter({
       },
     });
   }),
+  getUserRfid: protectedProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        RFID: true,
+      },
+    });
+  }),
 
   updateUserRFID: adminProcedure
     .input(
@@ -165,6 +178,22 @@ export const userDataRouter = createTRPCRouter({
       return ctx.prisma.user.update({
         where: {
           id: input.userId,
+        },
+        data: {
+          RFID: input.RFID,
+        },
+      });
+    }),
+  updateOwnRFID: protectedProcedure
+    .input(
+      z.object({
+        RFID: z.string(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.user.update({
+        where: {
+          id: ctx.session.user.id,
         },
         data: {
           RFID: input.RFID,

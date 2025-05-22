@@ -4,7 +4,7 @@ import { WebSocket } from "ws";
 
 import { createTRPCRouter, protectedProcedure } from "rbgs/server/api/trpc";
 import { env } from "rbgs/env.mjs";
-
+import { getRfid } from "./rfid";
 interface WebSocketResponse {
   success: boolean;
   data?: string; // success=true
@@ -513,32 +513,3 @@ export const prestamosRouter = createTRPCRouter({
       });
     }),
 });
-
-const getRfid = async () => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
-
-  try {
-    const response = await fetch(`${env.RFID_SERVER}/read-rfid`, {
-      method: "GET",
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      return "No se pudo leer el RFID.";
-    }
-
-    const schema = z.object({
-      token: z.string(),
-    });
-
-    return schema.parse(await response.json());
-  } catch (error) {
-    if ((error as Error).name === "AbortError") {
-      return "Timeout al leer el RFID.";
-    }
-    return "Error al leer el RFID.";
-  } finally {
-    clearTimeout(timeoutId);
-  }
-};
