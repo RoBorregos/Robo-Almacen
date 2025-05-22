@@ -11,7 +11,7 @@ interface ViewProps {
   userId: string;
 }
 
-const View: React.FC<ViewProps> = ({ userId }) => {
+const View: React.FC<ViewProps> = ({ handleClick, userId }) => {
   const { data } = api.userData.getUserData.useQuery({
     id: userId,
   });
@@ -122,10 +122,10 @@ const View: React.FC<ViewProps> = ({ userId }) => {
             </button>
           </div>
         </div>
-        {/* <ViewElement label="Major" value={data?.major || ""} />
+        <ViewElement label="Major" value={data?.major || ""} />
         <ViewElement label="Semester" value={data?.semester || 0} />
         <ViewElement label="Phone" value={data?.phone || ""} />
-        <ViewElement label="Area" value={data?.area || ""} /> */}
+        <ViewElement label="Area" value={data?.area || ""} />
         {/* <div className="mt-2 flex w-full flex-row justify-between">
           <button
             className="rounded-md bg-blue-500 px-7 py-1 text-white hover:bg-blue-600"
