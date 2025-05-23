@@ -1,16 +1,13 @@
-import { useSession } from "next-auth/react";
-
-import { signOut, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 const AuthButton: React.FC = () => {
-  const { data: sessionData } = useSession();
 
   return (
     <button
-      className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-      onClick={sessionData ? () => void signOut() : () => void signIn()}
+      className="font-inter mr-12 rounded-lg border bg-blue-700 px-4 py-1 text-gray-100 transition duration-300 hover:bg-blue-800"
+      onClick={() => void signIn()}
     >
-      {sessionData ? "Sign out" : "Sign in"}
+      Sign in
     </button>
   );
 };
