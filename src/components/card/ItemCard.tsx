@@ -55,7 +55,7 @@ export const ItemCard = ({
     onSuccess: (message) => {
       toast.success(message, {
         position: "top-center",
-        autoClose: false,
+        autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -161,13 +161,15 @@ export const ItemCard = ({
                         <Button
                           key={celdaItem.id}
                           onClick={() => {
-                            createPrestamo.mutate({
-                              id: id,
-                              quantity: amount,
-                              description: description,
-                              celdaId: celdaItem.Celda.id,
-                              celdaItemId: celdaItem.id,
-                            });
+                            if (!createPrestamo.isLoading) {
+                              createPrestamo.mutate({
+                                id: id,
+                                quantity: amount,
+                                description: description,
+                                celdaId: celdaItem.Celda.id,
+                                celdaItemId: celdaItem.id,
+                              });
+                            }
                           }}
                           variant="outline"
                           className="rounded-lg bg-black p-2 text-white transition duration-300 hover:bg-blue-700"

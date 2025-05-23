@@ -1,5 +1,6 @@
 import { Item } from "@prisma/client";
 import { api } from "rbgs/utils/api";
+import { formatDate } from "rbgs/utils/date";
 
 const ItemCard = ({ item }: { item: Item | null | undefined }) => {
   const { data: itemsCounts } = api.items.getItemCounts.useQuery({
@@ -57,11 +58,11 @@ const ItemCard = ({ item }: { item: Item | null | undefined }) => {
           <br />
           <li>
             {" "}
-            <b>Creado:</b> {item?.createdAt.toDateString()}{" "}
+            <b>Creado:</b> {formatDate(item?.createdAt)}{" "}
           </li>
           <li>
             {" "}
-            <b>Actualizado:</b> {item?.updatedAt.toDateString()}{" "}
+            <b>Actualizado:</b> {formatDate(item?.updatedAt)}{" "}
           </li>
         </ul>
       </div>

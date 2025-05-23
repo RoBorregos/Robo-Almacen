@@ -1,13 +1,21 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { WebSocket } from "ws";
 
-import {
-  createTRPCRouter,
-  //   publicProcedure,
-  protectedProcedure,
-} from "rbgs/server/api/trpc";
-
+import { createTRPCRouter, protectedProcedure } from "rbgs/server/api/trpc";
 import { env } from "rbgs/env.mjs";
+import { getRfid } from "./rfid";
+interface WebSocketResponse {
+  success: boolean;
+  data?: string; // success=true
+  error?: string; // success=false
+}
+
+interface WebSocketRequest {
+  x: number;
+  y: number;
+  trackId: number;
+}
 
 export const prestamosRouter = createTRPCRouter({
   getPrestamosId: protectedProcedure
@@ -76,6 +84,12 @@ export const prestamosRouter = createTRPCRouter({
             select: {
               name: true,
               id: true,
+            },
+          },
+          Celda: {
+            select: {
+              column: true,
+              row: true,
             },
           },
         },
@@ -223,6 +237,8 @@ export const prestamosRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        x: z.number(),
+        y: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -243,8 +259,7 @@ export const prestamosRouter = createTRPCRouter({
         return "Error: el préstamo ya fue devuelto.";
       }
 
-      // Verify user
-      //  Fetch user rfid
+      // Fetch user rfid
       const userRfid = await ctx.prisma.user.findUnique({
         where: {
           id: ctx.session.user.id,
@@ -343,6 +358,32 @@ export const prestamosRouter = createTRPCRouter({
           message: "Error inesperado.",
         });
       }
+
+      try {
+        const ws = new WebSocket(env.WEBSOCKET_URL);
+
+        // Wait for connection to open
+        await new Promise<void>((resolve, reject) => {
+          ws.once("open", () => {
+            resolve();
+          });
+          ws.once("error", () => {
+            reject();
+          });
+        });
+
+        // Send x and y in the WebSocket message
+        const message = JSON.stringify({ x: input.x, y: input.y });
+        ws.send(message);
+        ws.close();
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al conectar con el WebSocket.",
+        });
+      }
+
       return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
 
@@ -350,6 +391,8 @@ export const prestamosRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        x: z.number(),
+        y: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -378,6 +421,32 @@ export const prestamosRouter = createTRPCRouter({
           message: "El RFID no coincide con el usuario.",
         });
       }
+
+      try {
+        const ws = new WebSocket(env.WEBSOCKET_URL_WSS);
+
+        // Wait for connection to open
+        await new Promise<void>((resolve, reject) => {
+          ws.once("open", () => {
+            resolve();
+          });
+          ws.once("error", () => {
+            reject();
+          });
+        });
+
+        // Send x and y in the WebSocket message
+        const message = JSON.stringify({ x: input.x, y: input.y });
+        ws.send(message);
+        ws.close();
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al conectar con el WebSocket.",
+        });
+      }
+
       await ctx.prisma.prestamo.update({
         where: {
           id: input.id,
@@ -444,32 +513,3 @@ export const prestamosRouter = createTRPCRouter({
       });
     }),
 });
-
-const getRfid = async () => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
-
-  try {
-    const response = await fetch(`${env.RFID_SERVER}/read-rfid`, {
-      method: "GET",
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      return "No se pudo leer el RFID.";
-    }
-
-    const schema = z.object({
-      token: z.string(),
-    });
-
-    return schema.parse(await response.json());
-  } catch (error) {
-    if ((error as Error).name === "AbortError") {
-      return "Timeout al leer el RFID.";
-    }
-    return "Error al leer el RFID.";
-  } finally {
-    clearTimeout(timeoutId);
-  }
-};

@@ -28,6 +28,7 @@ export const env = createEnv({
     GOOGLE_SECRET: z.string(),
     WEBSOCKET_URL: z.string().url(),
     RFID_SERVER: z.string(),
+    WEBSOCKET_URL_WSS: z.string().url(),
   },
 
   /**
@@ -57,5 +58,6 @@ export const env = createEnv({
     GOOGLE_SECRET: process.env.GOOGLE_SECRET,
     WEBSOCKET_URL: process.env.WEBSOCKET_URL,
     RFID_SERVER: process.env.RFID_SERVER,
+    WEBSOCKET_URL_WSS: process.env.WEBSOCKET_URL_WSS,
   },
 });
