@@ -118,7 +118,6 @@ export const PrestamoCard = ({
                 <p>Fecha de regreso: {formatDate(prestamo.finalDate)}</p>
               )}
             </div>
-            {/* BUTTONS JUST FOR TESTING */}
             {!prestamo.returned && prestamo.issued && (
               <button
                 onClick={() => {
@@ -128,8 +127,6 @@ export const PrestamoCard = ({
                     });
                     returnPrestamo.mutate({
                       id: id,
-                      x: prestamo.Celda.row,
-                      y: prestamo.Celda.column,
                     });
                   }
                 }}
@@ -144,8 +141,6 @@ export const PrestamoCard = ({
                   if (!issuePrestamo.isLoading) {
                     issuePrestamo.mutate({
                       id: id,
-                      x: prestamo.Celda.row,
-                      y: prestamo.Celda.column,
                     });
                     toast.success("Emitiendo préstamo...", {
                       autoClose: 10000,

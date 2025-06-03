@@ -232,13 +232,10 @@ export const prestamosRouter = createTRPCRouter({
 
       return "Préstamo creado exitosamente, abra las celda que seleccionó para obtener el item ";
     }),
-
   returnPrestamo: protectedProcedure
     .input(
       z.object({
         id: z.string(),
-        x: z.number(),
-        y: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -248,6 +245,12 @@ export const prestamosRouter = createTRPCRouter({
         },
         include: {
           Item: true,
+          Celda: {
+            select: {
+              row: true,
+              column: true,
+            },
+          },
         },
       });
 
@@ -373,7 +376,10 @@ export const prestamosRouter = createTRPCRouter({
         });
 
         // Send x and y in the WebSocket message
-        const message = JSON.stringify({ x: input.x, y: input.y });
+        const message = JSON.stringify({
+          x: prestamo.Celda.row,
+          y: prestamo.Celda.column,
+        });
         ws.send(message);
         ws.close();
       } catch (error) {
@@ -386,16 +392,34 @@ export const prestamosRouter = createTRPCRouter({
 
       return "La celda fue abierta. Regrese los items y cierre la celda.";
     }),
-
   issuePrestamo: protectedProcedure
     .input(
       z.object({
         id: z.string(),
-        x: z.number(),
-        y: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const prestamo = await ctx.prisma.prestamo.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          Celda: {
+            select: {
+              row: true,
+              column: true,
+            },
+          },
+        },
+      });
+
+      if (!prestamo) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No se encontró el préstamo.",
+        });
+      }
+
       const userRfid = await ctx.prisma.user.findUnique({
         where: {
           id: ctx.session.user.id,
@@ -436,7 +460,10 @@ export const prestamosRouter = createTRPCRouter({
         });
 
         // Send x and y in the WebSocket message
-        const message = JSON.stringify({ x: input.x, y: input.y });
+        const message = JSON.stringify({
+          x: prestamo.Celda.row,
+          y: prestamo.Celda.column,
+        });
         ws.send(message);
         ws.close();
       } catch (error) {
