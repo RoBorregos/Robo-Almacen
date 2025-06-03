@@ -285,78 +285,54 @@ export const prestamosRouter = createTRPCRouter({
           code: "UNAUTHORIZED",
           message: "El RFID no coincide con el usuario.",
         });
-      }
-
-      // Check cells that have the item. Return the item to the cell that has the most of the same item
-      // and that has space to store the item.
-
-      const celdaItem = await ctx.prisma.celdaItem.findFirst({
+      } // Return the item to the original cell where it was taken from
+      const originalCeldaItem = await ctx.prisma.celdaItem.findFirst({
         where: {
-          Item: {
-            id: prestamo.Item.id,
-          },
-        },
-        orderBy: {
-          quantity: "desc",
+          celdaId: prestamo.celdaId,
+          itemId: prestamo.Item.id,
         },
       });
 
-      // Select a random cell.
-      const returnCell = await ctx.prisma.celdaItem.findFirst({});
-
-      if (celdaItem) {
-        // Store the items in the cell that has the most of the returned item.
+      if (originalCeldaItem) {
+        // Return items to the original cell
         await ctx.prisma.$transaction(async (tx) => {
           await tx.celdaItem.update({
             where: {
-              id: celdaItem.id,
+              id: originalCeldaItem.id,
             },
             data: {
-              quantity: celdaItem.quantity + prestamo.quantity,
+              quantity: originalCeldaItem.quantity + prestamo.quantity,
             },
           });
-          await ctx.prisma.prestamo.update({
+          await tx.prestamo.update({
             where: {
               id: prestamo.id,
             },
             data: {
               returned: true,
+              finalDate: new Date(),
             },
           });
         });
-
-        // Open cell
-        // open(celdaItem.celdaId);
-      } else if (!celdaItem && returnCell) {
-        // Store the items in the first available cell.
-
+      } else {
+        // If the original cell-item relationship doesn't exist, create it
         await ctx.prisma.$transaction(async (tx) => {
-          await tx.celdaItem.update({
-            where: {
-              id: returnCell?.id,
-            },
+          await tx.celdaItem.create({
             data: {
-              quantity: (returnCell?.quantity ?? 0) + prestamo.quantity,
+              celdaId: prestamo.celdaId,
+              itemId: prestamo.Item.id,
+              quantity: prestamo.quantity,
             },
           });
           await tx.prestamo.update({
             where: {
-              id: input.id,
+              id: prestamo.id,
             },
             data: {
               returned: true,
+              finalDate: new Date(),
             },
           });
-        });
-      } else if (!celdaItem && !returnCell) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "No hay ninguna celda disponible para regresar el pedido.",
-        });
-      } else {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Error inesperado.",
         });
       }
 
