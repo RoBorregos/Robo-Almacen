@@ -245,6 +245,11 @@ export const prestamosRouter = createTRPCRouter({
         },
         include: {
           Item: true,
+          User: {
+            select: {
+              RFID: true,
+            },
+          },
           Celda: {
             select: {
               row: true,
@@ -262,15 +267,8 @@ export const prestamosRouter = createTRPCRouter({
         return "Error: el préstamo ya fue devuelto.";
       }
 
-      // Fetch user rfid
-      const userRfid = await ctx.prisma.user.findUnique({
-        where: {
-          id: ctx.session.user.id,
-        },
-        select: {
-          RFID: true,
-        },
-      });
+      // Fetch user rfid from the prestamo owner
+      const userRfid = prestamo.User;
 
       // Read from server
       const rfid = await getRfid();
@@ -404,6 +402,11 @@ export const prestamosRouter = createTRPCRouter({
           id: input.id,
         },
         include: {
+          User: {
+            select: {
+              RFID: true,
+            },
+          },
           Celda: {
             select: {
               row: true,
@@ -420,14 +423,7 @@ export const prestamosRouter = createTRPCRouter({
         });
       }
 
-      const userRfid = await ctx.prisma.user.findUnique({
-        where: {
-          id: ctx.session.user.id,
-        },
-        select: {
-          RFID: true,
-        },
-      });
+      const userRfid = prestamo.User;
 
       // Read from server
       const rfid = await getRfid();
