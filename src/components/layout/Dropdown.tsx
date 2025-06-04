@@ -1,5 +1,5 @@
 import { signOut } from "next-auth/react";
-
+import Link from "next/link";
 // From https://tailwindcss.com/plus/ui-blocks/application-ui/elements/dropdowns
 
 const Dropdown : React.FC = () => {
@@ -11,11 +11,12 @@ const Dropdown : React.FC = () => {
 	    <div
 		className="py-1"
 		role="menu-wall">
-		<a
+		<Link
 		    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+		    href="/profile"
 		    role="menu-item">
-		    Account settings
-		</a>
+		    Profile
+		</Link>
 		<a
 		    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
 		    role="menui-item"
