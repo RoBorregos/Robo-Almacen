@@ -19,7 +19,7 @@ const Dropdown : React.FC = () => {
 		</Link>
 		<a
 		    className="block px-4 py-2 text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-100 hover:text-gray-900"
-		    role="menui-item"
+		    role="menu-item"
 		    onClick={() => void signOut()}>
 		    Sign out
 		</a>
