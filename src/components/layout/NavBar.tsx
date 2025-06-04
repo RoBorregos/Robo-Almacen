@@ -68,8 +68,8 @@ const NavBar = ({
 		    </ul>
 		</div>
 	    </div>
-	    <div className="flex items-center justify-end">
-		<div className="flex justify-center">
+	    <div className="flex items-center justify-center">
+		<div className="flex justify-center relative">
 		    {sessionData ? Avatar({image: sessionData.user.image!, state: userMenuState, stateSetter: setUserMenuState}) : AuthButton({})}
 		</div>
 	    </div>

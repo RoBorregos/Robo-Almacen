@@ -5,7 +5,7 @@ import Link from "next/link";
 const Dropdown : React.FC = () => {
     return ( 
 	<div
-	    className="absolute right-10 z-10 mt-10 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5"
+	    className="absolute left-0 z-10 mt-10 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5"
 	    role="menu"
 	>
 	    <div
@@ -18,7 +18,7 @@ const Dropdown : React.FC = () => {
 		    Profile
 		</Link>
 		<a
-		    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+		    className="block px-4 py-2 text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-100 hover:text-gray-900"
 		    role="menui-item"
 		    onClick={() => void signOut()}>
 		    Sign out
