@@ -1,10 +1,17 @@
-import { useSession } from "next-auth/react";
-import { useState, useEffect } from 'react';
+import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import AuthButton from "../auth/AuthButton";
 import Avatar from "../auth/Avatar";
-
 import { allowedRole } from "rbgs/utils/roles";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "rbgs/components/ui/dropdown-menu"
 
 const color = "text-slate-950 hover:text-sky-800";
 
@@ -24,20 +31,6 @@ const NavBar = ({
 	}
 	return true;
     });
-
-    const [userMenuState, setUserMenuState] = useState(false); // menu state (dropdown)
-
-    function clickHandler(event: MouseEvent)
-    {
-	    const target = event.target as HTMLInputElement;
-	    const dropdown = document.getElementById("userMenu");
-	    const avatarMenu = document.getElementById("avatarMenu")
-	    if(dropdown && !dropdown.classList.contains('hidden') && !avatarMenu!.contains(target)) setUserMenuState(false);
-    }
-    // Hook into document root JS
-    useEffect(() => {
-	document.addEventListener("click", clickHandler);
-    }, []);
 
     return (
 	<div className="grid h-16 w-full grid-cols-3 justify-evenly px-10 font-mono">
@@ -60,9 +53,9 @@ const NavBar = ({
 		    <ul className="flex items-center">
 			{filteredRoutes.map((route) => (
 			    <li className="mr-6 inline-block" key={route.name}>
-				<a className={color} href={route.path}>
+				<Link className={color} href={route.path}>
 				    {route.name}
-				</a>
+				</Link>
 			    </li>
 			))}
 		    </ul>
@@ -70,7 +63,28 @@ const NavBar = ({
 	    </div>
 	    <div className="flex items-center justify-center">
 		<div className="flex justify-center relative">
-		    {sessionData ? Avatar({image: sessionData.user.image!, state: userMenuState, stateSetter: setUserMenuState}) : AuthButton({})}
+		    {sessionData ?
+			<DropdownMenu>
+			    <DropdownMenuTrigger>{
+				Avatar({image: sessionData.user.image!})}
+			    </DropdownMenuTrigger>
+			    <DropdownMenuContent align='start'>
+				<DropdownMenuItem>
+				    <Link
+					href="/profile">
+					Profile
+				    </Link>
+				</DropdownMenuItem>
+				<DropdownMenuSeparator/>
+				<DropdownMenuItem>
+				    <a onClick={() => void signOut()}>
+					Sign out
+				    </a>
+				</DropdownMenuItem>
+			    </DropdownMenuContent>
+			</DropdownMenu>:
+			AuthButton({})
+		    }
 		</div>
 	    </div>
 	</div>
