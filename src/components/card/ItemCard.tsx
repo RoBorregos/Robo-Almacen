@@ -1,31 +1,26 @@
-import { VerticalGeneralCard } from "./VerticalGeneralCard";
-import { api } from "../../utils/api";
-import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
+"use client";
+
 import { useState } from "react";
 import { toast } from "react-toastify";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "src/components/ui/dialog";
+import { api } from "../../utils/api";
 import { Button } from "src/components/ui/button";
+import { Input } from "src/components/ui/input";
+import { Label } from "src/components/ui/label";
+import { Skeleton } from "src/components/ui/skeleton";
+import { ShoppingCart } from "lucide-react";
 
-// Item Card must contain:
-// Buttons to edit order amount
-// Button to order item
-// Count of the amount of items
-// Validate min and max amount to order
+import { VerticalGeneralCard } from "./vertical-general-card";
+import { QuantitySelector } from "./quantity-selector";
+import { AvailabilityBadge } from "./availability-badge";
+import { LockerSelectionDialog } from "./locker-selection-dialog";
+import type { CeldaItem } from "./item";
 
-export const ItemCard = ({
-  id,
-  className = "",
-}: {
+interface ItemCardProps {
   id: string;
   className?: string;
-}) => {
+}
+
+export const ItemCard = ({ id, className = "" }: ItemCardProps) => {
   const [amount, setAmount] = useState(1);
   const [description, setDescription] = useState("");
   const [open, setOpen] = useState(false);
@@ -36,7 +31,7 @@ export const ItemCard = ({
     id: id,
   });
 
-  // TODO: get the max available count
+  // Get the max available count
   const { data: availableCount } = api.items.getMaxLockerItemCount.useQuery({
     id: id,
   });
@@ -65,6 +60,8 @@ export const ItemCard = ({
       });
       void context.items.invalidate();
       setOpen(false); // Close dialog on success
+      setAmount(1); // Reset amount
+      setDescription(""); // Reset description
     },
     onError: (error) => {
       toast.error(error.message, {
@@ -80,119 +77,96 @@ export const ItemCard = ({
     },
   });
 
+  const handleSelectLocker = (celdaItem: CeldaItem) => {
+    if (!createPrestamo.isLoading) {
+      createPrestamo.mutate({
+        id: id,
+        quantity: amount,
+        description: description,
+        celdaId: celdaItem.Celda.id,
+        celdaItemId: celdaItem.id,
+      });
+    }
+  };
+
   if (isLoading) {
     return (
-      <VerticalGeneralCard className={className}>
-        <h6 className="text-center text-4xl font-bold text-white">
-          Cargando...
-        </h6>
-      </VerticalGeneralCard>
-    );
-  } else if (item) {
-    return (
-      <VerticalGeneralCard
-        className={
-          className + " cursor-default border-0 shadow-xl shadow-black"
-        }
-        title={
-          item.name +
-          " - (" +
-          (totalAvailableCount !== undefined
-            ? totalAvailableCount.toString()
-            : "cargando...") +
-          " disponibles)"
-        }
-        imageLink={item.imgPath}
-      >
-        <div className="flex flex-col">
-          <div className="mb-2 flex h-fit w-full flex-row justify-around align-middle">
-            <AiOutlineMinusCircle
-              className={`text-black transition duration-300 ${
-                amount === 1 ? "opacity-50" : "cursor-pointer hover:scale-110"
-              }`}
-              size={30}
-              color="#1D4ED8"
-              onClick={() => {
-                if (amount > 1) setAmount(amount - 1);
-              }}
-            />
-
-            <p className="text-4xl text-black">{amount}</p>
-
-            <AiOutlinePlusCircle
-              className={`text-black transition duration-300 ${
-                amount === (availableCount ?? 0)
-                  ? "opacity-50"
-                  : "cursor-pointer hover:scale-110"
-              }`}
-              size={30}
-              color="#1D4ED8"
-              onClick={() => {
-                const maxPossible = Math.min(amount + 1, availableCount ?? 0);
-                setAmount(maxPossible);
-              }}
-            />
-          </div>
-          <input
-            className="text-md mb-2 rounded-md bg-slate-900 p-2"
-            placeholder="Descripción del pedido (opcional)"
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
-          />
-
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="mt-3 w-full rounded-lg bg-blue-700 p-2 text-white transition duration-300 hover:bg-blue-800">
-                Pedir {amount} {item.name}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle className="mb-3 w-full text-center font-mono text-lg">
-                  Casilleros disponibles
-                </DialogTitle>
-              </DialogHeader>
-              <DialogDescription>
-                <div className="grid grid-cols-2 gap-3 font-mono">
-                  {celdasWithItem?.map(
-                    (celdaItem) =>
-                      celdaItem.quantity >= amount && (
-                        <Button
-                          key={celdaItem.id}
-                          onClick={() => {
-                            if (!createPrestamo.isLoading) {
-                              createPrestamo.mutate({
-                                id: id,
-                                quantity: amount,
-                                description: description,
-                                celdaId: celdaItem.Celda.id,
-                                celdaItemId: celdaItem.id,
-                              });
-                            }
-                          }}
-                          variant="outline"
-                          className="rounded-lg bg-black p-2 text-white transition duration-300 hover:bg-blue-700"
-                        >
-                          {celdaItem.Celda.name} ({celdaItem.quantity}{" "}
-                          disponibles)
-                        </Button>
-                      )
-                  )}
-                </div>
-              </DialogDescription>
-            </DialogContent>
-          </Dialog>
+      <VerticalGeneralCard className={`w-80 ${className}`}>
+        <div className="space-y-4">
+          <Skeleton className="mx-auto h-4 w-3/4" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-10 w-full" />
         </div>
       </VerticalGeneralCard>
     );
-  } else {
+  }
+
+  if (!item) {
     return (
-      <VerticalGeneralCard className={className}>
-        <h6 className="text-center text-4xl font-bold text-white">
-          No se encontró el artículo
-        </h6>
+      <VerticalGeneralCard className={`w-80 ${className}`}>
+        <div className="py-8 text-center">
+          <p className="text-lg font-medium text-muted-foreground">
+            No se encontró el artículo
+          </p>
+        </div>
       </VerticalGeneralCard>
     );
   }
+
+  return (
+    <>
+      <VerticalGeneralCard
+        className={`w-80 cursor-default border-0 shadow-xl shadow-black ${className}`}
+        title={item.name}
+        imageLink={item.imgPath}
+      >
+        <div className="flex flex-col space-y-4">
+          <AvailabilityBadge
+            count={totalAvailableCount}
+            isLoading={isLoading}
+          />
+
+          <div className="mb-2 mt-2">
+            <QuantitySelector
+              value={amount}
+              onChange={setAmount}
+              min={1}
+              max={availableCount ?? 0}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="description" className="sr-only">
+              Descripción del pedido
+            </Label>
+            <Input
+              id="description"
+              className="w-full rounded-md bg-slate-100 p-2 text-sm dark:bg-slate-900"
+              placeholder="Descripción del pedido (opcional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          <Button
+            onClick={() => setOpen(true)}
+            className="mt-3 w-full rounded-lg bg-blue-700 p-2 text-white transition duration-300 hover:bg-blue-800"
+          >
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            Pedir {amount} {item.name}
+          </Button>
+        </div>
+      </VerticalGeneralCard>
+
+      <LockerSelectionDialog
+        open={open}
+        onOpenChange={setOpen}
+        celdasWithItem={celdasWithItem}
+        amount={amount}
+        itemName={item.name}
+        onSelectLocker={handleSelectLocker}
+        isLoading={createPrestamo.isLoading}
+      />
+    </>
+  );
 };
