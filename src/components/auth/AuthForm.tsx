@@ -98,6 +98,7 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
             }
 
         }
+
     }
 
     return (
@@ -108,7 +109,7 @@ const AuthForm: React.FC<FormProps> = ({ onSubmit, userId }) => {
                     // onUpload={(result) => handleUpload(result)}
                     uploadPreset="cerid1mq"
                 >
-                    <Avatar image={userData?.image || 'Logo2.svg'} edit />
+                    <Avatar image={userData?.image || 'Logo2.svg'} />
 
                 </CldUploadButton>
                 <User />
