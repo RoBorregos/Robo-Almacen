@@ -42,19 +42,19 @@ cp .env.example .env
 
 (Or just make sure that the `.env` file is in the root directory)
 
-1. Install dependencies
+4. Install dependencies
 
 ```bash
 npm install
 ```
 
-1. Pull the latest changes from the Database
+5. Pull the latest changes from the Database
 
 ```bash
 npx prisma db pull
 ```
 
-5. Run the development server
+6. Run the development server
 
 ```bash
 npm run dev
